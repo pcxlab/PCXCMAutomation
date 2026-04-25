@@ -1,0 +1,6 @@
+﻿ops/logs/
+ops/reports/
+ops/artifacts/
+.vscode/
+*.tmp
+*.bak
