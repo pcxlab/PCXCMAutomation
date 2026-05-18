@@ -321,6 +321,7 @@ function Create-PCXPackage {
     )
 
     try {
+        Clear-Host
         Write-PCXLog "===== START ====="
 
         $files     = Test-PCXPackagePath $Path
@@ -386,5 +387,5 @@ function Create-PCXPackage {
 # EXECUTION
 # ============================
 
-Create-PCXPackage -Path "\\192.168.25.214\Package_source\Applications\Igor Pavlov\7zip\7zip 26.0.0\"
+#Create-PCXPackage -Path "\\192.168.25.214\Package_source\Applications\Igor Pavlov\7zip\7zip 26.0.0\"
 Create-PCXPackage -Path "\\192.168.25.214\Package_source\Applications\Igor Pavlov\7zip\7zip 26.0.1\"
