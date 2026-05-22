@@ -52,4 +52,8 @@ function New-PCXCMApplication{
     Function Usage example :
     New-PCXCMApplication -Name "APS_7zip_26.0.1" -Description "New Application" -Publisher "Igor-Pavlov" -SoftwereVersion "26.00" -ReleaseDate "2/12/2026" -Iconlocationfile "\\192.168.25.214\Package_Source\Applications\Igor_Pavlov\7Zip_msi\7zip_26.0.0\7ZipIcon.png"
   #>
+
+    
+    New-PCXCMApplication -Name "APS_7zip_26.0.1" -Description "New Application" -Publisher "Igor-Pavlov" -SoftwereVersion "26.00" -ReleaseDate "2/12/2026" -Iconlocationfile "\\192.168.25.214\Package_Source\Applications\Igor Pavlov\7zip\7zip 26.0.0\7ZipIcon.png"
+  
    

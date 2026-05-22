@@ -1,4 +1,39 @@
-﻿# ============================
+<#
+Create-PCXApplication
+│
+├─ Test-PCXPackagePath
+├─ Get-PCXPackageMetadata
+├─ Get-PCXInstaller
+├─ Get-PCXCommandLine
+├─ Get Icon File
+├─ Connect-PCXCMSite
+│
+├─ New-PCXCMApplication
+├─ New-PCXCMApplicationDeploymentType
+├─ Start-PCXCMContentDistributionForApplication
+├─ New-PCXCMDeviceCollection
+├─ New-PCXCMApplicationDeployment
+├─ Move Application to SCCM Folder
+└─ Move Collection to SCCM Folder
+#>
+
+
+# Test-PCXPackagePath
+# Get-PCXPackageMetadata
+# Get-PCXInstaller
+# Get-PCXCommandLine
+# Get Icon File
+# Connect-PCXCMSite
+
+# New-PCXCMApplication
+# New-PCXCMApplicationDeploymentType
+# Start-PCXCMContentDistributionForApplication
+# New-PCXCMDeviceCollection
+# New-PCXCMApplicationDeployment
+# Move Application to SCCM Folder
+# Move Collection to SCCM Folder
+
+# ============================
 # INIT
 # ============================
 
@@ -647,106 +682,186 @@ function Set-SCCMCollectionRules {
 # MAIN
 # ============================
 
-function Create-PCXPackage {
+function Create-PCXApplication {
 
+    [CmdletBinding()]
     param(
-        [Parameter(Mandatory)][string]$Path,
-        [string]$Language = "EN-US",
+        [Parameter(Mandatory)]
+        [string]$Path,
+
         [string]$DPGroup = "All Mangalore Dps",
-        [string]$LimitingCollectionName = "ALL Systems"
+
+        [string]$AvailableDateTime = (
+            Get-Date -Format 'yyyy-MM-dd 00:00:00'
+        ),
+
+        [string]$DeadlineDateTime = (
+            (Get-Date).AddDays(1).ToString('yyyy-MM-dd 00:00:00')
+        )
     )
 
     try {
         #Clear-Host
-        Write-PCXLog "===== START ====="
+        Write-PCXLog "===== APPLICATION CREATION STARTED ====="
 
+        # Validate source path
         $files = Test-PCXPackagePath $Path
+
+        # Detect installer
         $installer = Get-PCXInstaller $files
+
+        # Extract metadata
         $meta = Get-PCXPackageMetadata $Path
 
-        $programs = Get-ProgramNames -PackageName $meta.PackageName
-        $collections = Get-CollectionNames -PackageName $meta.PackageName
+        #$collections = Get-CollectionNames -PackageName $meta.ApplicationName
 
-        Write-PCXLog "Package: $($meta.PackageName)"
-        Write-PCXLog "Installer: $($installer.Name)"
+        # Build application name
+        $ApplicationName = "APP $($meta.Name)"
 
+        # Find icon file
+        $IconFile = $files |
+            Where-Object {
+                $_.Extension -match '\.(png|ico|jpg|jpeg)$'
+            } |
+            Select-Object -First 1
+
+        if (-not $IconFile) {
+            Write-PCXLog "No icon file found. Application will be created without icon." "WARN"
+        }
+
+        Write-PCXLog "Application Name : $ApplicationName"
+        Write-PCXLog "Publisher        : $($meta.Company)"
+        Write-PCXLog "Version          : $($meta.Version)"
+        Write-PCXLog "Installer        : $($installer.Name)"
+
+        # Connect to SCCM
         Connect-PCXCMSite
 
-        $platforms = Get-CMSupportedPlatform -Fast | Where-Object {
-            $_.DisplayText -like "*Windows 11*"
-        }
-
+        # Step 1 - Create Application
         Invoke-PCXWithRetry {
-            New-CMPackage -Name $meta.PackageName -Manufacturer $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            New-PCXCMApplication `
+                -Name $ApplicationName `
+                -Description "New Application" `
+                -Publisher $meta.Company `
+                -SoftwereVersion $meta.Version `
+                -ReleaseDate (Get-Date) `
+                -Iconlocationfile $IconFile.FullName
         }
 
-        Write-PCXLog "Package created"
+        Write-PCXLog "Application created"
 
-        # INSTALL
-        Add-PCXProgram $meta.PackageName "Install" (Get-PCXCommandLine $Path "Install" $installer) $platforms
-
-        # AVAILABLE (NEW)
-        Add-PCXProgram `
-            -PackageName $meta.PackageName `
-            -Type "Available" `
-            -CommandLine (Get-PCXCommandLine $Path "Install" $installer) `
-            -Platforms $platforms
-
-        # UNINSTALL
-        Add-PCXProgram $meta.PackageName "Uninstall" (Get-PCXCommandLine $Path "Uninstall" $installer) $platforms
-
-        # UPGRADE (optional)
-        if (Test-PCXHasUpgrade $Path) {
-            $upCmd = Get-PCXCommandLine $Path "Upgrade" $installer
-            if ($upCmd) {
-                Add-PCXProgram $meta.PackageName "Upgrade" $upCmd $platforms
-            }
-        }
-
-        # OSD
-        Add-PCXProgram $meta.PackageName "OSD" (Get-PCXCommandLine $Path "OSD" $installer) $platforms
-
+        # Step 2 - Create Deployment Type
         Invoke-PCXWithRetry {
-            Start-CMContentDistribution -PackageName $meta.PackageName -DistributionPointGroupName $DPGroup
+            New-PCXCMApplicationDeploymentType `
+                -Name $ApplicationName `
+                -InstallationFileLocation $installer.FullName
         }
 
-        New-SCCMCollections `
-            -Collections $collections `
-            -LimitingCollectionName $LimitingCollectionName
+        Write-PCXLog "Deployment Type created"
 
-        $DeadlineTime = (Get-Date -Hour 20 -Minute 0 -Second 0).AddDays(30)
+        # Step 3 - Distribute Content
+        Invoke-PCXWithRetry {
+            Start-PCXCMContentDistributionForApplication `
+                -ApplicationName $ApplicationName `
+                -DistributionPointGroup $DPGroup
+        }
 
-        New-SCCMDeployments `
-            -PackageName $meta.PackageName `
-            -Programs $programs `
-            -Collections $collections `
-            -DeadlineTime $DeadlineTime
+        Write-PCXLog "Content distributed"
 
-        
-        Set-SCCMCollectionRules `
-            -Collections $collections
-        
-        Move-SCCMCollectionsToFolder `
-            -Collections $collections `
-            -meta $meta
+        # Step 4 - Create Collection
+        Invoke-PCXWithRetry {
+            New-PCXCMDeviceCollection `
+                -CollectionName $ApplicationName
+        }
 
-        Move-SCCMPackageToFolder `
-            -meta $meta
-        
-        Write-PCXLog "SUCCESS: $($meta.PackageName)"
+        Write-PCXLog "Collection created"
+
+        # Step 5 - Deploy Application
+        Invoke-PCXWithRetry {
+            New-PCXCMApplicationDeployment `
+                -Name $ApplicationName `
+                -AvailableDateTime $AvailableDateTime `
+                -CollectionName $ApplicationName `
+                -DeadlineDateTime $DeadlineDateTime `
+                -Action Install `
+                -Purpose Available
+        }
+
+        Write-PCXLog "Application deployed"
+
+        Write-PCXLog "SUCCESS: $ApplicationName"
+
+        return [PSCustomObject]@{
+            Success         = $true
+            ApplicationName = $ApplicationName
+            Publisher       = $meta.Company
+            Version         = $meta.Version
+            Installer       = $installer.Name
+            SourcePath      = $Path
+        }
     }
     catch {
         Write-PCXLog "FAILED: $($_.Exception.Message)" "ERROR"
         throw
     }
     finally {
-        Write-PCXLog "Create Pacakge execution completed"
+        Write-PCXLog "Application creation completed"
     }
 }
 
-# ============================
-# EXECUTION
-# ============================
+Create-PCXApplication -Path "\\192.168.25.214\Package_Source\Applications\Igor Pavlov\7zip\7zip 26.0.0"
 
-Create-PCXPackage -Path "\\192.168.25.214\Package_source\Applications\Igor Pavlov\7zip\7zip 26.0.0\"
-#Create-PCXPackage -Path "\\192.168.25.214\Package_source\Applications\Igor Pavlov\7zip\7zip 26.0.1\"
+<# Reproduce case
+
+Remove-CMApplicationDeployment -Name "APP Igor Pavlov 7zip 26.0.0" -Force
+
+If you get below error delete the deployment first.
+PS PS1:\> Remove-CMApplication -Name "APP Igor Pavlov 7zip 26.0.0" -Force
+Remove-CMApplication : Configuration Manager cannot delete this application because other 
+applications or task sequences reference it or it is configured as a deployment.
+        Details:
+        Number of dependent applications: 0
+        Number of active deployments: 1
+        Number of dependent task sequences: 0 
+        Number of virtual environments:0
+        To view the dependent applications, open the application properties and then click the 
+References tab from the console. 
+        To view the active deployments, select the application and then select the Deployments 
+tab from the console.
+At line:1 char:1
++ Remove-CMApplication -Name "APP Igor Pavlov 7zip 26.0.0" -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidResult: (Microsoft.Confi...moveApplication:RemoveApplicati 
+   on) [Remove-CMApplication], InvalidOperationException
+    + FullyQualifiedErrorId : UnableToDeleteApplication,Microsoft.ConfigurationManagement.Power 
+   Shell.Cmdlets.AppMan.RemoveApplication
+
+
+Remove-CMApplication -Name "APP Igor Pavlov 7zip 26.0.0" -Force   
+
+If you get below error wait for 120minue and close console if opened if still nto working you amy need to try reboot wiln ot how
+
+Remove-CMApplication : ConfigMgr Error Object:
+instance of SMS_ExtendedStatus
+{
+        Description = "User PCXLAB\\Administrator is not able to get the lock at this time. Error: 
+0x40480732";
+        ErrorCode = 1078462258;
+        File = "F:\\dbs\\sh\\cmgm\\0326_183130\\cmd\\d\\src\\SiteServer\\SDK_Provider\\SMSProv\\ssputil
+ity.cpp";
+        Line = 3355;
+        ObjectInfo = "CObjectLock";
+        Operation = "ExecMethod";
+        ParameterInfo = "SMS_Application.CI_ID=16777600";
+        ProviderName = "WinMgmt";
+        StatusCode = 2147749889;
+};
+At line:1 char:1
++ Remove-CMApplication -Name "APP Igor Pavlov 7zip 26.0.0" -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Microsoft.Confi...moveApplication:RemoveApplicatio 
+   n) [Remove-CMApplication], WqlQueryException
+    + FullyQualifiedErrorId : UnhandledException,Microsoft.ConfigurationManagement.PowerShell.C 
+   mdlets.AppMan.RemoveApplication
+
+#>

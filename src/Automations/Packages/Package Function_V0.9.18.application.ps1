@@ -657,7 +657,7 @@ function Create-PCXPackage {
     )
 
     try {
-        #Clear-Host
+        Clear-Host
         Write-PCXLog "===== START ====="
 
         $files = Test-PCXPackagePath $Path
