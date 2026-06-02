@@ -28,6 +28,8 @@ function Start-PCXCMContentDistribution {
 
                     $null = Start-CMContentDistribution -ApplicationName $ApplicationName -DistributionPointGroupName $DistributionPointGroupName
 
+                    Write-PCXLog "Application content distribution initiated"
+
                     return [PSCustomObject]@{
                         Success                    = $true
                         ContentType                = 'Application'
@@ -43,6 +45,8 @@ function Start-PCXCMContentDistribution {
 
                     $null = Start-CMContentDistribution -PackageName $PackageName -DistributionPointGroupName $DistributionPointGroupName
 
+                    Write-PCXLog "Package content distribution initiated"
+                    
                     return [PSCustomObject]@{
                         Success                    = $true
                         ContentType                = 'Package'

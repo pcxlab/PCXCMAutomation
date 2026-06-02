@@ -2,7 +2,6 @@ function Connect-PCXCMSite {
 
     [CmdletBinding()]
     param(
-
         [Parameter(Mandatory = $false)]
         [string]$SiteCode = $(Get-PCXCMSiteCode),
 
@@ -11,49 +10,32 @@ function Connect-PCXCMSite {
     )
 
     begin {
-
         $OperationSucceeded = $true
-
         Write-PCXOperationStart
     }
 
     process {
-
         try {
+            # Always reload ConfigurationManager module
+            $CMModulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
 
-            # Import Configuration Manager module
-            if (-not (Get-Module ConfigurationManager)) {
+            Import-Module $CMModulePath -Force -ErrorAction Stop
 
-                Write-Verbose "PCXLab - Importing ConfigurationManager module"
-
-                $CMModulePath = Join-Path `
-                    (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) `
-                    "ConfigurationManager.psd1"
-
-                Import-Module $CMModulePath -ErrorAction Stop
+            # Verify CMSite provider loaded
+            if (-not (Get-PSProvider CMSite -ErrorAction SilentlyContinue)) {
+                throw "CMSite provider failed to load."
             }
 
             # Create PSDrive if missing
-            $existingDrive = Get-PSDrive `
-                -Name $SiteCode `
-                -PSProvider CMSite `
-                -ErrorAction SilentlyContinue
+            $existingDrive = Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue
 
             if (-not $existingDrive) {
-
                 Write-Verbose "PCXLab - Creating CMSite drive $SiteCode"
-
-                $null = New-PSDrive `
-                    -Name $SiteCode `
-                    -PSProvider CMSite `
-                    -Root $ProviderMachineName `
-                    -ErrorAction Stop
+                $null = New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $ProviderMachineName -ErrorAction Stop
             }
 
-            # Set location to site drive
+            # Switch location
             Set-Location "${SiteCode}:\"
-
-            Write-Verbose "PCXLab - Connected to site drive ${SiteCode}:"
 
             [PSCustomObject]@{
                 Success             = $true
@@ -64,23 +46,18 @@ function Connect-PCXCMSite {
             }
         }
         catch {
-
             $OperationSucceeded = $false
-Write-PCXLog "Failed to connect to Configuration Manager site. $($_.Exception.Message)" "ERROR"
-
+            Write-PCXLog "Failed to connect to Configuration Manager site. $($_.Exception.Message)" "ERROR"
             throw
         }
     }
 
     end {
-
         if ($OperationSucceeded) {
-
             Write-PCXOperationEnd -Status Success
         }
     }
 }
-
 <#
 .SYNOPSIS
 Imports the Configuration Manager module, connects to the CMSite drive,
@@ -104,6 +81,3 @@ Connect-PCXCMSite -SiteCode ABC -ProviderMachineName CM01
 .NOTES
 PCXLab Automation Framework
 #>
-
-
-

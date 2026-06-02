@@ -1,14 +1,15 @@
 function Test-PCXCMConnection {
-<#
-.SYNOPSIS
-Tests if Configuration Manager PowerShell connection is available.
-#>
 
     [CmdletBinding()]
     param()
 
     try {
-        $null = Get-PSDrive -PSProvider CMSite -ErrorAction Stop
+
+        $drive = Get-PSDrive -PSProvider CMSite -ErrorAction Stop
+
+        if (-not $drive) {
+            return $false
+        }
 
         return $true
     }
@@ -16,4 +17,3 @@ Tests if Configuration Manager PowerShell connection is available.
         return $false
     }
 }
-

@@ -79,7 +79,7 @@ function Create-PCXCMApplication {
                 -Iconlocationfile $IconFile.FullName
 
             # Step 2 - Create Deployment Type
-            New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $installer.FullName
+            $null = New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $installer.FullName
 
             # Step 2.1 - Add Windows 11 Requirement
             $OSValidateSetPath = Join-Path $PSScriptRoot "..\..\Config\OSValidateSet.csv"
@@ -108,7 +108,7 @@ function Create-PCXCMApplication {
             $null = Start-PCXCMContentDistribution -ApplicationName $ApplicationName -DistributionPointGroupName $DPGroup
 
             # Step 5 - Deploy Application
-            New-PCXCMApplicationDeployment `
+            $null = New-PCXCMApplicationDeployment `
                 -Name $ApplicationName `
                 -AvailableDateTime $AvailableDateTime `
                 -CollectionName $Collections.Available `
@@ -116,7 +116,7 @@ function Create-PCXCMApplication {
                 -Action Install `
                 -Purpose Available
 
-            New-PCXCMApplicationDeployment `
+            $null = New-PCXCMApplicationDeployment `
                 -Name $ApplicationName `
                 -AvailableDateTime $AvailableDateTime `
                 -CollectionName $Collections.Install `
@@ -124,7 +124,7 @@ function Create-PCXCMApplication {
                 -Action Install `
                 -Purpose Required
 
-            New-PCXCMApplicationDeployment `
+            $null = New-PCXCMApplicationDeployment `
                 -Name $ApplicationName `
                 -AvailableDateTime $AvailableDateTime `
                 -CollectionName $Collections.Uninstall `

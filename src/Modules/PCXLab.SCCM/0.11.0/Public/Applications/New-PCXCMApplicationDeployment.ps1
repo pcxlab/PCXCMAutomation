@@ -12,10 +12,12 @@ function New-PCXCMApplicationDeployment {
         [parameter(Mandatory = $true, Position = 3)] 
         [DateTime]$DeadlineDateTime,
 
-        [parameter(Mandatory = $true, Position = 4)] 
+        [Parameter(Mandatory = $true, Position = 4)]
+        [ValidateSet("Install", "Uninstall")]
         [string]$Action,
 
-        [parameter(Mandatory = $true, Position = 5)] 
+        [Parameter(Mandatory = $true, Position = 5)]
+        [ValidateSet("Available", "Required")]
         [string]$Purpose
     )
     begin {
@@ -27,16 +29,9 @@ function New-PCXCMApplicationDeployment {
         try {
 
             Write-PCXLog "Creating application deployment: $Name"
-            <#
-            $null = New-CMApplicationDeployment `
-                -Name $Name `
-                -AvailableDateTime $AvailableDateTime `
-                -CollectionName $CollectionName `
-                -DeadlineDateTime $DeadlineDateTime `
-                -DeployAction $Action `
-                -DeployPurpose $Purpose
-
-                #>
+            Write-PCXLog "Collection : $CollectionName"
+            Write-PCXLog "Purpose : $Purpose"
+            Write-PCXLog "Action : $Action"
 
             if ($Purpose -eq "Available") {
 
@@ -64,7 +59,6 @@ function New-PCXCMApplicationDeployment {
             Write-PCXLog "Failed to create application deployment: $Name. $($_.Exception.Message)" "ERROR"
             throw
         }
-        
     }
     end {
         Write-PCXOperationEnd -Status Success
