@@ -5,13 +5,18 @@ function Test-PCXCMConnection {
 
     try {
 
-        $drive = Get-PSDrive -PSProvider CMSite -ErrorAction Stop
+        $SiteCode = Get-PCXCMSiteCode
 
-        if (-not $drive) {
-            return $false
+        $CurrentLocation = Get-Location
+
+        if (
+            $CurrentLocation.Drive -and
+            $CurrentLocation.Drive.Name -eq $SiteCode
+        ) {
+            return $true
         }
 
-        return $true
+        return $false
     }
     catch {
         return $false

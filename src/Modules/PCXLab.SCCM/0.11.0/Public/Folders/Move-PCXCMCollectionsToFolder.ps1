@@ -45,7 +45,7 @@ function Move-PCXCMCollectionsToFolder {
             }
         }
         catch {
-            Write-PCXLog "Failed to move collections: $ObjectName. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to move collections: $ObjectName. $($_.Exception.Message)" -Level ERROR
 
             throw
         }
@@ -56,6 +56,7 @@ function Move-PCXCMCollectionsToFolder {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

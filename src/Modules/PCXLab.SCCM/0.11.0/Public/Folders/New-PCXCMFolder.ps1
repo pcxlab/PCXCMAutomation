@@ -1,4 +1,4 @@
-﻿function New-PCXCMFolder {
+function New-PCXCMFolder {
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -108,7 +108,7 @@
             }
         }
         catch {
-            Write-PCXLog "Folder creation failed: $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Folder creation failed: $($_.Exception.Message)" -Level ERROR
             throw
         }
     }
@@ -166,6 +166,7 @@ Get-ChildItem -path "PS1:\DeviceCollection\RootFolder"
 #Remove-Module PCXCMModule
 #Remove-Module PCXCMModule -Force
 #############################################################
+
 
 
 

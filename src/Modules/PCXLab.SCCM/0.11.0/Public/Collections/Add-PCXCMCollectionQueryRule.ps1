@@ -40,7 +40,7 @@ function Add-PCXCMCollectionQueryRule {
             Write-PCXLog "Query rule added: $RuleName"
         }
         catch {
-Write-PCXLog "Failed to add query rule '$RuleName' to collection '$CollectionName'. $_" "ERROR"
+Write-PCXLog -Message "Failed to add query rule '$RuleName' to collection '$CollectionName'. $_" -Level ERROR
 
             throw
         }
@@ -62,5 +62,6 @@ Add-CMDeviceCollectionQueryMembershipRule -CollectionName $CollectionName -Query
 Usage Example :
 Add-PCXCMCollectionQueryRule -CollectionName "APP Igor Pavlov 7zip 26.0.2 [INSTALL]" -RuleName "Installed Devices" -QueryExpression "select SMS_R_SYSTEM.ResourceID from SMS_R_System"
 #>
+
 
 

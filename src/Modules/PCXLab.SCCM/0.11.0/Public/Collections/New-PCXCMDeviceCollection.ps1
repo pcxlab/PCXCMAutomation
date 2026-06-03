@@ -35,7 +35,7 @@ function New-PCXCMDeviceCollection {
             Write-PCXLog "Device collection created: $CollectionName"
         }
         catch {
-Write-PCXLog "Failed to create device collection: $CollectionName. $_" "ERROR"
+Write-PCXLog -Message "Failed to create device collection: $CollectionName. $_" -Level ERROR
 
             throw
         }
@@ -60,5 +60,6 @@ New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[Available]"
 New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[UnInstall]"
 New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[Exception]"
 #>
+
 
 

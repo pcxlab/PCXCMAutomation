@@ -25,7 +25,7 @@ function Move-PCXCMPackageToFolder {
             Write-PCXLog "Moved Package: $PackageName"
         }
         catch {
-            Write-PCXLog "Failed to move package: $PackageName. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to move package: $PackageName. $($_.Exception.Message)" -Level ERROR
 
             throw
         }
@@ -36,6 +36,7 @@ function Move-PCXCMPackageToFolder {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

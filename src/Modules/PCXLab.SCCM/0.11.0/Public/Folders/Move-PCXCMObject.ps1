@@ -45,7 +45,7 @@ function Move-PCXCMObject {
         }
         catch {
             #Write-PCXMessage -Type Error -Message "Move failed: $($_.Exception.Message)"
-            Write-PCXLog "Move failed: $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Move failed: $($_.Exception.Message)" -Level ERROR
 
             return New-PCXResultObject `
                 -Success $false `
@@ -76,6 +76,7 @@ $col = Get-PCXCMDeviceCollection -Name "PCX - Test"
 
 Move-PCXCMObject -InputObject $col -FolderPath "\DeviceCollection\Production"
 #>
+
 
 
 

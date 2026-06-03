@@ -56,7 +56,7 @@ function New-PCXCMApplicationDeployment {
             Write-PCXLog "Application deployment created: $Name"
         }
         catch {
-            Write-PCXLog "Failed to create application deployment: $Name. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to create application deployment: $Name. $($_.Exception.Message)" -Level ERROR
             throw
         }
     }
@@ -81,6 +81,7 @@ New-PCXCMApplicationDeployment -Name "APS_7zip_26.0.1" -AvailableDateTime "2026-
 New-PCXCMApplicationDeployment -Name "APS_7zip_26.0.1" -AvailableDateTime "2026-04-21 00:00:00" -CollectionName "PKG_7zip_2.0.0_01[Install]" -DeadlineDateTime "2026-04-22 00:00:00" -Action Install -Purpose Required
 New-PCXCMApplicationDeployment -Name "APS_7zip_26.0.1" -AvailableDateTime "2026-04-21 00:00:00" -CollectionName "PKG_7zip_2.0.0_01[UnInstall]" -DeadlineDateTime "2026-04-22 00:00:00" -Action Uninstall -Purpose Required
 #>
+
 
 
 

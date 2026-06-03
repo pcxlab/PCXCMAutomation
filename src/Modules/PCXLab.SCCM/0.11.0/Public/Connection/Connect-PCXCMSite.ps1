@@ -47,7 +47,7 @@ function Connect-PCXCMSite {
         }
         catch {
             $OperationSucceeded = $false
-            Write-PCXLog "Failed to connect to Configuration Manager site. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to connect to Configuration Manager site. $($_.Exception.Message)" -Level ERROR
             throw
         }
     }
@@ -81,3 +81,4 @@ Connect-PCXCMSite -SiteCode ABC -ProviderMachineName CM01
 .NOTES
 PCXLab Automation Framework
 #>
+

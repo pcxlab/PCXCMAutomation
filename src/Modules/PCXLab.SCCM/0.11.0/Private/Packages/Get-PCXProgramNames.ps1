@@ -8,7 +8,9 @@ function Get-PCXProgramNames {
         Available = "$PackageName [AVAILABLE]"
         Install   = "$PackageName [INSTALL]"
         Uninstall = "$PackageName [UNINSTALL]"
-        Upgrade   = "$PackageName [Upgrade]"
+        Upgrade   = "$PackageName [UPGRADE]"
+        OSD       = "$PackageName [OSD]"
     }
 }
+
 

@@ -14,6 +14,7 @@ function Create-PCXCMPackage {
     }
 
     process {
+        $OriginalLocation = Get-Location
         try {
 
             $files = Test-PCXPackagePath $Path
@@ -28,11 +29,15 @@ function Create-PCXCMPackage {
             Write-PCXLog "Package: $PackageName"
             Write-PCXLog "Installer: $($installer.Name)"
 
+            #############TESTING ONLY
+            Write-PCXLog "Current Location: $(Get-Location)"
             Ensure-PCXCMConnection
+            Write-PCXLog "After Connect: $(Get-Location)"
 
             $platforms = Get-CMSupportedPlatform -Fast | Where-Object { $_.DisplayText -like "*Windows 11*" }
 
-            $null = New-CMPackage -Name $PackageName -Manufacturer $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            #$null = New-CMPackage -Name $PackageName -Manufacturer $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
 
             Write-PCXLog "Package created"
 
@@ -69,14 +74,21 @@ function Create-PCXCMPackage {
             Write-PCXLog "SUCCESS: $PackageName"
         }
         catch {
-            Write-PCXLog "FAILED: $($_.Exception.Message)" "ERROR"
-throw
+            Write-PCXLog -Message $_.Exception.ToString() -Level ERROR 
+            throw
         }
         finally {
+
+            try {
+                Set-Location $OriginalLocation
+            }
+            catch {
+            }
         }
     }
     end {
         Write-PCXOperationEnd
     }
 }
+
 

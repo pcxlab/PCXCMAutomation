@@ -61,7 +61,7 @@ function Create-PCXCMApplication {
             Select-Object -First 1
 
             if (-not $IconFile) {
-                Write-PCXLog "No icon file found. Application will be created without icon." "WARN"
+                Write-PCXLog -Message "No icon file found. Application will be created without icon." -Level WARNING
             }
 
             Write-PCXLog "Application Name : $ApplicationName"
@@ -152,7 +152,7 @@ function Create-PCXCMApplication {
             #>
         }
         catch {
-            Write-PCXLog "FAILED: $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "FAILED: $($_.Exception.Message)" -Level ERROR
             throw
         }
     }
@@ -237,4 +237,5 @@ At line:1 char:1
    mdlets.AppMan.RemoveApplication
 
 #>
+
 

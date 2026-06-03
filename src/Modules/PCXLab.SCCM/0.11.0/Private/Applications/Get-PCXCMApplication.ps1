@@ -21,7 +21,7 @@ function Get-PCXCMApplication {
             return $Application
         }
         catch {
-            Write-PCXLog "Failed to get application: $ApplicationName. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to get application: $ApplicationName. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -31,6 +31,7 @@ function Get-PCXCMApplication {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

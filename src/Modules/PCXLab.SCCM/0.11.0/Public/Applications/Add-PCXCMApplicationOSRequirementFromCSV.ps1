@@ -47,7 +47,7 @@ function Add-PCXCMApplicationOSRequirementFromCSV {
                 Write-Output $Result
             }
             catch {
-                Write-PCXLog "Failed processing application: $ApplicationName. $($_.Exception.Message)" "ERROR"
+                Write-PCXLog -Message "Failed processing application: $ApplicationName. $($_.Exception.Message)" -Level ERROR
                 $FailureResult = New-PCXReportObject `
                     -ApplicationName $ApplicationName `
                     -Requirement $Requirement `
@@ -83,5 +83,6 @@ function Add-PCXCMApplicationOSRequirementFromCSV {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 

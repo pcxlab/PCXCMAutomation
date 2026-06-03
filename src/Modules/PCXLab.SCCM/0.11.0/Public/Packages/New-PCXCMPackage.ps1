@@ -24,33 +24,36 @@ function New-PCXCMPackage {
     }
     process {
         try {
+
+            # TEMP TESTING ONLY BLOCCK
+            Write-PCXLog "PackageName : $PackageName"
+            Write-PCXLog "Company     : $Company"
+            Write-PCXLog "Version     : $Version"
+            Write-PCXLog "Language    : $Language"
+            Write-PCXLog "Path        : $Path"
+
             # Assign package object to variable
-            $Package = Get-CMPackage -Name $PackageName -ErrorAction SilentlyContinue
+            $Package = Get-CMPackage -Name $PackageName -Fast -ErrorAction SilentlyContinue
+
 
             # Check whether package already exists
             if ($Package -ne $null) {
-                Write-PCXLog "Package already exists: $PackageName"
                 throw "Package already exists: $PackageName"
             }
 
             Write-PCXLog "Creating package: $PackageName"
 
-            $null = New-CMPackage `
-                -Name $PackageName `
-                -Manufacturer $Company `
-                -Version $Version `
-                -Language $Language `
-                -Path $Path
+            $null = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
 
             Write-PCXLog "Package created: $PackageName"
         }
         catch {
-            Write-PCXLog "Failed to create package: $PackageName. $($_.Exception.Message)" "ERROR"
-throw
+            Write-PCXLog -Message $_.Exception.ToString() -Level ERROR
+            throw
         }   
     }
     end {
-        Write-PCXOperationEnd -Status Success
+        Write-PCXOperationEnd
     }
 }
 
@@ -64,6 +67,7 @@ New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Langu
 Usage Example :
 New-PCXCMPackage -PackageName "PKG_7zip_2.0.1" -Company "Igor_Pavlov" -Version "2.0.0" -Language "EN-US" -Path "\\192.168.25.214\Package_Source\Applications\Igor_Pavlov\7zip\7zip_2.0.0"
 #>
+
 
 
 

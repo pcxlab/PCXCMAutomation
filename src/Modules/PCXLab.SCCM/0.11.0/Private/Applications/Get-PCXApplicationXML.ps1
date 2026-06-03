@@ -22,7 +22,7 @@ function Get-PCXApplicationXML {
             )
         }
         catch {
-            Write-PCXLog "Failed to get application XML. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to get application XML. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -32,6 +32,7 @@ function Get-PCXApplicationXML {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

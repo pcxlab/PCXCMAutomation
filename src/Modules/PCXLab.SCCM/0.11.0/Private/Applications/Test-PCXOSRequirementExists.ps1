@@ -29,7 +29,7 @@ function Test-PCXOSRequirementExists {
             return $false
         }
         catch {
-            Write-PCXLog "Failed to test OS requirement existence: $Requirement. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to test OS requirement existence: $Requirement. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -39,6 +39,7 @@ function Test-PCXOSRequirementExists {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

@@ -23,7 +23,7 @@ function Import-PCXApplicationList {
                 Select-Object -ExpandProperty "Application Name"
         }
         catch {
-            Write-PCXLog "Failed to import application list: $CsvPath. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to import application list: $CsvPath. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -33,6 +33,7 @@ function Import-PCXApplicationList {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

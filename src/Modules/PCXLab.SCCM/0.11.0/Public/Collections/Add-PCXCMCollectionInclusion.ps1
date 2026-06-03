@@ -49,7 +49,7 @@ function Add-PCXCMCollectionInclusion {
             }
         }
         catch {
-Write-PCXLog "Failed to add inclusion collections to '$SelectCollectionName'. $_" "ERROR"
+Write-PCXLog -Message "Failed to add inclusion collections to '$SelectCollectionName'. $_" -Level ERROR
 
             throw
         }
@@ -74,5 +74,6 @@ Add-PCXCMCollectionInclusion -SelectCollectionName "APP Igor Pavlov 7zip 26.0.2 
 Usage Example (Multiple Collections) :
 Add-PCXCMCollectionInclusion -SelectCollectionName "APP Igor Pavlov 7zip 26.0.2 [INSTALL]" -IncludeCollectionNames @("CollectionA","CollectionB","CollectionC")
 #>
+
 
 

@@ -178,7 +178,7 @@ function New-PCXCMApplicationDeploymentType {
             }
         }
         catch {
-            Write-PCXLog "Deployment type creation failed: $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Deployment type creation failed: $($_.Exception.Message)" -Level ERROR
 throw
         }
     }
@@ -186,4 +186,5 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
+
 

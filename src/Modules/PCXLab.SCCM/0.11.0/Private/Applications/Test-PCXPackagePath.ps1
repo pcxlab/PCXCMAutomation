@@ -38,7 +38,7 @@ function Test-PCXPackagePath {
         catch {
 
             $OperationSucceeded = $false
-Write-PCXLog "File enumeration failed on path: $cleanPath. $($_.Exception.Message)" "ERROR"
+Write-PCXLog -Message "File enumeration failed on path: $cleanPath. $($_.Exception.Message)" -Level ERROR
 
             throw "File enumeration failed on path: $cleanPath | $($_.Exception.Message)"
         }
@@ -52,5 +52,6 @@ Write-PCXLog "File enumeration failed on path: $cleanPath. $($_.Exception.Messag
         }
     }
 }
+
 
 

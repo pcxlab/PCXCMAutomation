@@ -34,7 +34,7 @@ function New-PCXCMApplication {
             Write-PCXLog "Application created: $Name"
         }
         catch {
-            Write-PCXLog "Failed to create application: $Name. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to create application: $Name. $($_.Exception.Message)" -Level ERROR
 throw
         }
     }
@@ -42,4 +42,5 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
+
 

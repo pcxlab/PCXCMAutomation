@@ -52,12 +52,12 @@ function Add-PCXCMCollectionExclusion {
                 }
                 catch {
 
-                    Write-PCXLog "Failed to add exclusion collection '$ExcludeCollectionName' to '$SelectCollectionName'. $_" "ERROR"
+                    Write-PCXLog -Message "Failed to add exclusion collection '$ExcludeCollectionName' to '$SelectCollectionName'. $_" -Level ERROR
                 }
             }
         }
         catch {
-Write-PCXLog "Failed to process exclusion collections for '$SelectCollectionName'. $_" "ERROR"
+Write-PCXLog -Message "Failed to process exclusion collections for '$SelectCollectionName'. $_" -Level ERROR
 
             throw
         }
@@ -82,5 +82,6 @@ Add-PCXCMCollectionExclusion -SelectCollectionName "APP Igor Pavlov 7zip 26.0.2 
 Usage Example (Multiple Collections) :
 Add-PCXCMCollectionExclusion -SelectCollectionName "APP Igor Pavlov 7zip 26.0.2 [INSTALL]" -ExcludeCollectionNames @("CollectionA","CollectionB","CollectionC")
 #>
+
 
 

@@ -101,7 +101,7 @@ function Add-PCXMemoryRequirementToDeploymentType {
             }
         }
         catch {
-            Write-PCXLog "Failed to add memory requirement. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to add memory requirement. $($_.Exception.Message)" -Level ERROR
 throw
         }
     }
@@ -109,5 +109,6 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 

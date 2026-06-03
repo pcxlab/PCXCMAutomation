@@ -84,7 +84,7 @@ function New-PCXCMDeviceCollectionInFolder {
 
             $Message = $_.Exception.Message
 
-            Write-PCXLog "Failed collection folder operation: $CollectionName. $Message" "ERROR"
+            Write-PCXLog -Message "Failed collection folder operation: $CollectionName. $Message" -Level ERROR
 
             if ($PassThru) {
 
@@ -142,4 +142,5 @@ System.Management.Automation.PSCustomObject (when -PassThru is used)
 Author  : PCXLab Automation Team
 Website : www.pcxlab.com
 #>
+
 

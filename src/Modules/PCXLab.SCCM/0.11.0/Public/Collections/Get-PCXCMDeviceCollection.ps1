@@ -41,7 +41,7 @@ function Get-PCXCMDeviceCollection {
             return $null
         }
         catch {
-Write-PCXLog "Failed to get device collection: $Name. $_" "ERROR"
+Write-PCXLog -Message "Failed to get device collection: $Name. $_" -Level ERROR
 
 
             throw
@@ -53,5 +53,6 @@ Write-PCXLog "Failed to get device collection: $Name. $_" "ERROR"
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 

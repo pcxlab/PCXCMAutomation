@@ -43,7 +43,7 @@ function Move-PCXCMApplicationToFolder {
                 -Message "Application moved successfully."
         }
         catch {
-            Write-PCXLog "Failed to move application: $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to move application: $($_.Exception.Message)" -Level ERROR
 
             return New-PCXResultObject `
                 -Success $false `
@@ -59,6 +59,7 @@ function Move-PCXCMApplicationToFolder {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

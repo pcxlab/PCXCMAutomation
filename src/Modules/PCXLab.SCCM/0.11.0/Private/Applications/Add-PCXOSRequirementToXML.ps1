@@ -73,7 +73,7 @@ function Add-PCXOSRequirementToXML {
             return $false
         }
         catch {
-            Write-PCXLog "Failed to update OS requirement XML. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to update OS requirement XML. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -83,6 +83,7 @@ function Add-PCXOSRequirementToXML {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

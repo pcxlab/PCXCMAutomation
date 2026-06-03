@@ -31,7 +31,7 @@ function Save-PCXApplicationXML {
                 -PassThru
         }
         catch {
-            Write-PCXLog "Failed to save application XML. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to save application XML. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -41,6 +41,7 @@ function Save-PCXApplicationXML {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

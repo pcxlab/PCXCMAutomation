@@ -37,7 +37,7 @@ function New-PCXDetectionClause {
             }
         }
         catch {
-            Write-PCXLog "Failed to create detection clause. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to create detection clause. $($_.Exception.Message)" -Level ERROR
 throw
         }
     }
@@ -45,4 +45,5 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
+
 

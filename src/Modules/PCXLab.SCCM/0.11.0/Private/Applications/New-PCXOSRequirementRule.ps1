@@ -33,7 +33,7 @@ function New-PCXOSRequirementRule {
             return $RequirementRule
         }
         catch {
-            Write-PCXLog "Failed to create OS requirement rule. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to create OS requirement rule. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -43,6 +43,7 @@ function New-PCXOSRequirementRule {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

@@ -29,7 +29,7 @@ function Add-PCXOSRequirementToDeploymentType {
                 -AddRequirement $RequirementRule
         }
         catch {
-            Write-PCXLog "Failed to add OS requirement: $ApplicationName. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to add OS requirement: $ApplicationName. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -39,6 +39,7 @@ function Add-PCXOSRequirementToDeploymentType {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

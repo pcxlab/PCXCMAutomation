@@ -2,7 +2,6 @@ function Write-PCXLog {
 
     [CmdletBinding()]
     param(
-
         [Parameter(Mandatory)]
         [string]$Message,
 
@@ -12,7 +11,6 @@ function Write-PCXLog {
 
     # Auto initialize if needed
     if (-not $Global:PCXLogFile) {
-
         Initialize-PCXLogging
     }
 
@@ -22,13 +20,10 @@ function Write-PCXLog {
         $Global:PCXOperationStack -and
         $Global:PCXOperationStack.Count -gt 0
     ) {
-
         $Operation = $Global:PCXOperationStack.Peek().Name
-
         $Line = "$TimeStamp [$Operation] [$Level] $Message"
     }
     else {
-
         #$Line = "$TimeStamp [$Level] $Message"
         $Line = "$TimeStamp [GENERAL] [$Level] $Message"
     }
@@ -39,23 +34,16 @@ function Write-PCXLog {
     if (
         $Global:PCXLogConfiguration.TerminalAppearance.EnableCustomColors
     ) {
-
         switch -Regex ($Message) {
-
             '^START\b' {
-
                 $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.StartColor
                 break
             }
-
             '^COMPLETED \(SUCCESS\)' {
-
                 $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.SuccessColor
                 break
             }
-
             '^COMPLETED \(FAILED\)' {
-
                 $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.FailedColor
                 break
             }
@@ -64,27 +52,18 @@ function Write-PCXLog {
 
     # Fall back to standard log level colors
     if (-not $ForegroundColor) {
-
         switch ($Level) {
-
-            "INFO" {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.InfoColor
-            }
-
-            "WARNING" {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.WarningColor
-            }
-
-            "ERROR" {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.ErrorColor
-            }
-
-            "DEBUG" {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.DebugColor
-            }
+            "INFO" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.InfoColor }
+            "WARNING" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.WarningColor }
+            "ERROR" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.ErrorColor }
+            "DEBUG" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.DebugColor }
         }
     }
 
+    # Ultimate safety fallback
+    if (-not $ForegroundColor) {
+        $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.InfoColor
+    }
     # Console output
     Write-Host $Line -ForegroundColor $ForegroundColor
 
@@ -95,10 +74,10 @@ function Write-PCXLog {
 
     # Write errors to separate error log
     if ($Level -eq "ERROR") {
-
         Add-Content `
             -Path $Global:PCXErrorLogFile `
             -Value $Line
     }
 }
+
 

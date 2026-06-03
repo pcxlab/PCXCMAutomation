@@ -57,7 +57,7 @@ function Start-PCXCMContentDistribution {
             }
         }
         catch {
-            Write-PCXLog "Content distribution failed. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Content distribution failed. $($_.Exception.Message)" -Level ERROR
             throw
         }
     }
@@ -65,4 +65,5 @@ function Start-PCXCMContentDistribution {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 

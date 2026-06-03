@@ -99,7 +99,7 @@ function Add-PCXDiskSpaceRequirementToDeploymentType {
             }
         }
         catch {
-            Write-PCXLog "Failed to add disk space requirement. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to add disk space requirement. $($_.Exception.Message)" -Level ERROR
 throw
         }
     }
@@ -107,6 +107,7 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

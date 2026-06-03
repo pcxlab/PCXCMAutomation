@@ -238,7 +238,7 @@ function Add-PCXCMApplicationOSRequirement {
             return $Result
         }
         catch {
-            Write-PCXLog "Failed OS requirement operation for application '$ApplicationName'. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed OS requirement operation for application '$ApplicationName'. $($_.Exception.Message)" -Level ERROR
 throw
         }
     }
@@ -246,6 +246,7 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 

@@ -35,7 +35,7 @@ function Get-PCXOSRequirementOperand {
             return $NamedPairs[$Requirement]
         }
         catch {
-            Write-PCXLog "Failed to get OS requirement operand: $Requirement. $($_.Exception.Message)" "ERROR"
+            Write-PCXLog -Message "Failed to get OS requirement operand: $Requirement. $($_.Exception.Message)" -Level ERROR
             throw
         }
         
@@ -45,6 +45,7 @@ function Get-PCXOSRequirementOperand {
         Write-PCXOperationEnd -Status Success
     }
 }
+
 
 
 
