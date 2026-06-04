@@ -35,6 +35,7 @@ function Create-PCXCMApplication {
         Write-PCXOperationStart
     }
     process {
+        $OriginalLocation = Get-Location
         try {
             Ensure-PCXCMConnection
         
@@ -74,7 +75,7 @@ function Create-PCXCMApplication {
                 -Name $ApplicationName `
                 -Description "New Application" `
                 -Publisher $meta.Company `
-                -SoftwereVersion $meta.Version `
+                -SoftwareVersion $meta.Version `
                 -ReleaseDate (Get-Date) `
                 -Iconlocationfile $IconFile.FullName
 
@@ -154,6 +155,13 @@ function Create-PCXCMApplication {
         catch {
             Write-PCXLog -Message "FAILED: $($_.Exception.Message)" -Level ERROR
             throw
+        }
+        finally {
+            try {
+                Set-Location $OriginalLocation
+            }
+            catch {
+            }
         }
     }
     end {

@@ -1,14 +1,14 @@
-function Get-PCXPackageMetadata {
+function Get-PCXApplicationMetadata {
 
     [CmdletBinding()]
     param(
 
         [Parameter(Mandatory)]
-        [string]$PackagePath
+        [string]$ApplicationPath
     )
 
     $PathParts =
-        $PackagePath.Split(
+        $ApplicationPath.Split(
             [System.IO.Path]::DirectorySeparatorChar
         )
 
@@ -17,14 +17,11 @@ function Get-PCXPackageMetadata {
         throw "Unable to determine Company, Product and Version from path."
     }
 
-    $Company =
-        $PathParts[-3]
+    $Company = $PathParts[-3]
 
-    $Product =
-        $PathParts[-2]
+    $Product = $PathParts[-2]
 
-    $PackageFolder =
-        $PathParts[-1]
+    $ApplicationFolder = $PathParts[-1]
 
     #
     # Example:
@@ -34,19 +31,19 @@ function Get-PCXPackageMetadata {
     #
 
     $Version =
-        $PackageFolder.Replace(
+        $ApplicationFolder.Replace(
             "$Product ",
             ""
         )
 
-    $PackageName =
-        "PKG $Company $Product $Version"
+    $ApplicationName =
+        "APP $Company $Product $Version"
 
     [PSCustomObject]@{
-
+        
         Company     = $Company
         Product     = $Product
         Version     = $Version
-        PackageName = $PackageName
+        ApplicationName = $ApplicationName
     }
 }

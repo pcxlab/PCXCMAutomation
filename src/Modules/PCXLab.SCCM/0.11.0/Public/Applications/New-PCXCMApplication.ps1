@@ -13,9 +13,9 @@ function New-PCXCMApplication {
         [string]$Publisher,
 
         [parameter(mandatory = $true, Position = 3)]
-        [string]$SoftwereVersion,
+        [string]$SoftwareVersion,
 
-        [parameter(mandatory = $true, Position = 4)]
+        [parameter(mandatory = $false, Position = 4)]
         [string]$Iconlocationfile,
 
         [parameter(mandatory = $true, Position = 5)]
@@ -28,9 +28,21 @@ function New-PCXCMApplication {
 
     process {
         try {
+            $ExistingApp = Get-CMApplication -Name $Name -Fast -ErrorAction SilentlyContinue
+
+            if ($ExistingApp) {
+                throw "Application already exists: $Name"
+            }
+
             Write-PCXLog "Creating application: $Name"
-            #$null = New-CMApplication -Name "$Name" -Description "$Description" -Publisher "$Publisher" -SoftwareVersion "$SoftwereVersion" -OptionalReference "Reference" -ReleaseDate "$ReleaseDate" -AutoInstall $true -Owner "Administrator" -SupportContact "Administrator" -LocalizedName "Application01" -UserDocumentation "https://contoso.com/content" -LinkText "For more information" -LocalizedDescription "New Localized Application" -Keyword "application" -PrivacyUrl "https://contoso.com/library/privacy" -IsFeatured $true -IconLocationFile "$Iconlocationfile"
-            $null = New-CMApplication -Name "$Name" -Description "$Description" -Publisher "$Publisher" -SoftwareVersion "$SoftwereVersion" -OptionalReference "Reference" -ReleaseDate "$ReleaseDate" -AutoInstall $true -LocalizedName "Application01" -UserDocumentation "https://contoso.com/content" -LinkText "For more information" -LocalizedDescription "New Localized Application" -Keyword "application" -PrivacyUrl "https://contoso.com/library/privacy" -IsFeatured $true -IconLocationFile "$Iconlocationfile"
+
+            if ($Iconlocationfile) {
+            $null = New-CMApplication -Name "$Name" -Description "$Description" -Publisher "$Publisher" -SoftwareVersion "$SoftwareVersion" -OptionalReference "Reference" -ReleaseDate "$ReleaseDate" -AutoInstall $true -LocalizedName "Application01" -UserDocumentation "https://contoso.com/content" -LinkText "For more information" -LocalizedDescription "New Localized Application" -Keyword "application" -PrivacyUrl "https://contoso.com/library/privacy" -IsFeatured $true -IconLocationFile "$Iconlocationfile"
+            }
+            else {
+            $null = New-CMApplication -Name "$Name" -Description "$Description" -Publisher "$Publisher" -SoftwareVersion "$SoftwareVersion" -OptionalReference "Reference" -ReleaseDate "$ReleaseDate" -AutoInstall $true -LocalizedName "Application01" -UserDocumentation "https://contoso.com/content" -LinkText "For more information" -LocalizedDescription "New Localized Application" -Keyword "application" -PrivacyUrl "https://contoso.com/library/privacy" -IsFeatured $true
+            }
+
             Write-PCXLog "Application created: $Name"
         }
         catch {

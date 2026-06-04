@@ -20,4 +20,4 @@ catch {
     return
 }
 
-& (Join-Path $ScriptRoot "Scripts\MainWindow.ps1")
+& (Join-Path $ScriptRoot "Scripts\ApplicationWindow.ps1")

@@ -3,12 +3,12 @@ Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 
-. (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXPackageMetadata.ps1")
+. (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXApplicationMetadata.ps1")
 . (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXCMDPGroups.ps1")
 . (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Test-PCXPackageSource.ps1")
 
 # Load XAML
-$XamlPath = Join-Path (Split-Path $PSScriptRoot -Parent) "Xaml\MainWindow.xaml"
+$XamlPath = Join-Path (Split-Path $PSScriptRoot -Parent) "Xaml\ApplicationWindow.xaml"
 
 [xml]$xaml = Get-Content $XamlPath
 
@@ -18,7 +18,7 @@ $Window = [Windows.Markup.XamlReader]::Load($reader)
 
 # Controls
 $txtSourcePath = $Window.FindName("txtSourcePath")
-$txtPackageName = $Window.FindName("txtPackageName")
+$txtApplicationName = $Window.FindName("txtApplicationName")
 $txtCompany = $Window.FindName("txtCompany")
 $txtProduct = $Window.FindName("txtProduct")
 $txtVersion = $Window.FindName("txtVersion")
@@ -28,7 +28,7 @@ $cmbDPGroup = $Window.FindName("cmbDPGroup")
 $txtStatus = $Window.FindName("txtStatus")
 
 $btnBrowse = $Window.FindName("btnBrowse")
-$btnCreatePackage = $Window.FindName("btnCreatePackage")
+$btnCreateApplication = $Window.FindName("btnCreateApplication")
 
 # Cache
 $script:LastLoadedSourcePath = ''
@@ -37,9 +37,9 @@ $script:LastLoadedSourcePath = ''
 # Helper Functions
 # ------------------------------------------------------------
 
-function Clear-PackageMetadata {
+function Clear-ApplicationMetadata {
 
-    $txtPackageName.Text = ''
+    $txtApplicationName.Text = ''
     $txtCompany.Text = ''
     $txtProduct.Text = ''
     $txtVersion.Text = ''
@@ -66,7 +66,7 @@ Write-GUIStatus "Ready"
 $txtSourcePath.Add_TextChanged({
 
     if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
-        Clear-PackageMetadata
+        Clear-ApplicationMetadata
         $script:LastLoadedSourcePath = ''
         $txtStatus.Clear()
         Write-GUIStatus "Ready"
@@ -86,26 +86,23 @@ $txtSourcePath.Add_LostFocus({
     }
 
     try {
+        Test-PCXPackageSource -PackagePath $CurrentPath
 
-        Test-PCXPackageSource `
-            -PackagePath $CurrentPath
-
-        $Metadata = Get-PCXPackageMetadata `
-            -PackagePath $CurrentPath
+        $Metadata = Get-PCXApplicationMetadata -ApplicationPath $CurrentPath
 
         $txtCompany.Text = $Metadata.Company
         $txtProduct.Text = $Metadata.Product
         $txtVersion.Text = $Metadata.Version
-        $txtPackageName.Text = $Metadata.PackageName
+        $txtApplicationName.Text = $Metadata.ApplicationName
 
         $script:LastLoadedSourcePath = $CurrentPath
 
-        Write-GUIStatus "Package information loaded."
+        Write-GUIStatus "Application information loaded."
     }
     catch {
-        Clear-PackageMetadata
+        Clear-ApplicationMetadata
         $script:LastLoadedSourcePath = ''
-        Write-GUIStatus "Invalid package source."
+        Write-GUIStatus "Invalid Application source."
     }
 
 })
@@ -131,7 +128,7 @@ if ($cmbDPGroup.Items.Count -gt 0) {
 $btnBrowse.Add_Click({
 
     $Dialog = New-Object System.Windows.Forms.OpenFileDialog
-    $Dialog.Title = "Select any file inside Package Folder"
+    $Dialog.Title = "Select any file inside Application Folder"
     $Dialog.Filter = "All Files (*.*)|*.*"
 
     if ($Dialog.ShowDialog() -eq "OK") {
@@ -145,7 +142,7 @@ $btnBrowse.Add_Click({
             Test-PCXPackageSource -PackagePath $Folder
         }
         catch {
-            Clear-PackageMetadata
+            Clear-ApplicationMetadata
             $script:LastLoadedSourcePath = ''
 
             [System.Windows.MessageBox]::Show(
@@ -158,19 +155,19 @@ $btnBrowse.Add_Click({
         $txtSourcePath.Text = $Folder
 
         try {
-            $Metadata = Get-PCXPackageMetadata -PackagePath $Folder
+            $Metadata = Get-PCXApplicationMetadata -ApplicationPath $Folder
 
             $txtCompany.Text = $Metadata.Company
             $txtProduct.Text = $Metadata.Product
             $txtVersion.Text = $Metadata.Version
-            $txtPackageName.Text = $Metadata.PackageName
+            $txtApplicationName.Text = $Metadata.ApplicationName
 
             $script:LastLoadedSourcePath = $Folder
 
-            Write-GUIStatus "Package information loaded."
+            Write-GUIStatus "Application information loaded."
         }
         catch {
-            Clear-PackageMetadata
+            Clear-ApplicationMetadata
             $script:LastLoadedSourcePath = ''
 
             [System.Windows.MessageBox]::Show(
@@ -183,37 +180,35 @@ $btnBrowse.Add_Click({
 })
 
 # ------------------------------------------------------------
-# Create Package
+# Create Application
 # ------------------------------------------------------------
 
-$btnCreatePackage.Add_Click({
+$btnCreateApplication.Add_Click({
 
     try {
 
         if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
             [System.Windows.MessageBox]::Show(
-                "Please select a package source path.",
+                "Please select a Application source path.",
                 "Validation Error"
             )
             return
         }
 
-        $btnCreatePackage.IsEnabled = $false
+        $btnCreateApplication.IsEnabled = $false
         $Window.Cursor = [System.Windows.Input.Cursors]::Wait
         # Enable below line only if cursor doesnt switch
         #[System.Windows.Forms.Application]::DoEvents()
 
-        Write-GUIStatus "Creating package..."
+        Write-GUIStatus "Creating Application..."
         Write-GUIStatus "Please do not close the window."
 
-        Create-PCXCMPackage `
-            -Path $txtSourcePath.Text `
-            -DPGroup $cmbDPGroup.SelectedItem
+        Create-PCXCMApplication -Path $txtSourcePath.Text -DPGroup $cmbDPGroup.SelectedItem
 
-        Write-GUIStatus "Package created successfully."
+        Write-GUIStatus "Application created successfully."
 
         [System.Windows.MessageBox]::Show(
-            "Package created successfully.",
+            "Application created successfully.",
             "PCXLab SCCM"
         )
 
@@ -224,13 +219,13 @@ $btnCreatePackage.Add_Click({
 
         [System.Windows.MessageBox]::Show(
             $_.Exception.Message,
-            "Package Creation Failed"
+            "Application Creation Failed"
         )
 
     }
     finally {
         $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
-        $btnCreatePackage.IsEnabled = $true
+        $btnCreateApplication.IsEnabled = $true
     }
 
 })
