@@ -3,7 +3,7 @@ Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 
-. (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXPackageMetadata.ps1")
+. (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXSourceMetadata.ps1")
 . (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXCMDPGroups.ps1")
 . (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Test-PCXPackageSource.ps1")
 
@@ -65,50 +65,48 @@ Write-GUIStatus "Ready"
 
 $txtSourcePath.Add_TextChanged({
 
-    if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
-        Clear-PackageMetadata
-        $script:LastLoadedSourcePath = ''
-        $txtStatus.Clear()
-        Write-GUIStatus "Ready"
-    }
-})
+        if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+            Clear-PackageMetadata
+            $script:LastLoadedSourcePath = ''
+            $txtStatus.Clear()
+            Write-GUIStatus "Ready"
+        }
+    })
 
 $txtSourcePath.Add_LostFocus({
 
-    $CurrentPath = $txtSourcePath.Text.Trim()
+        $CurrentPath = $txtSourcePath.Text.Trim()
 
-    if ([string]::IsNullOrWhiteSpace($CurrentPath)) {
-        return
-    }
+        if ([string]::IsNullOrWhiteSpace($CurrentPath)) {
+            return
+        }
 
-    if ($CurrentPath -eq $script:LastLoadedSourcePath) {
-        return
-    }
+        if ($CurrentPath -eq $script:LastLoadedSourcePath) {
+            return
+        }
 
-    try {
+        try {
 
-        Test-PCXPackageSource `
-            -PackagePath $CurrentPath
+            Test-PCXPackageSource -PackagePath $CurrentPath
 
-        $Metadata = Get-PCXPackageMetadata `
-            -PackagePath $CurrentPath
+            $Metadata = Get-PCXSourceMetadata -SourcePath $CurrentPath
 
-        $txtCompany.Text = $Metadata.Company
-        $txtProduct.Text = $Metadata.Product
-        $txtVersion.Text = $Metadata.Version
-        $txtPackageName.Text = $Metadata.PackageName
+            $txtCompany.Text = $Metadata.Company
+            $txtProduct.Text = $Metadata.Product
+            $txtVersion.Text = $Metadata.Version
+            $txtPackageName.Text = "PKG $($Metadata.Name)"
 
-        $script:LastLoadedSourcePath = $CurrentPath
+            $script:LastLoadedSourcePath = $CurrentPath
 
-        Write-GUIStatus "Package information loaded."
-    }
-    catch {
-        Clear-PackageMetadata
-        $script:LastLoadedSourcePath = ''
-        Write-GUIStatus "Invalid package source."
-    }
+            Write-GUIStatus "Package information loaded."
+        }
+        catch {
+            Clear-PackageMetadata
+            $script:LastLoadedSourcePath = ''
+            Write-GUIStatus "Invalid package source."
+        }
 
-})
+    })
 
 # ------------------------------------------------------------
 # Distribution Point Groups
@@ -130,57 +128,57 @@ if ($cmbDPGroup.Items.Count -gt 0) {
 
 $btnBrowse.Add_Click({
 
-    $Dialog = New-Object System.Windows.Forms.OpenFileDialog
-    $Dialog.Title = "Select any file inside Package Folder"
-    $Dialog.Filter = "All Files (*.*)|*.*"
+        $Dialog = New-Object System.Windows.Forms.OpenFileDialog
+        $Dialog.Title = "Select any file inside Package Folder"
+        $Dialog.Filter = "All Files (*.*)|*.*"
 
-    if ($Dialog.ShowDialog() -eq "OK") {
+        if ($Dialog.ShowDialog() -eq "OK") {
 
-        $Folder = Split-Path $Dialog.FileName -Parent
+            $Folder = Split-Path $Dialog.FileName -Parent
 
-        Write-Host "Selected Folder: $Folder" -ForegroundColor Yellow
-        Write-Host "Test-Path Result: $(Test-Path $Folder)" -ForegroundColor Yellow
+            Write-Host "Selected Folder: $Folder" -ForegroundColor Yellow
+            Write-Host "Test-Path Result: $(Test-Path $Folder)" -ForegroundColor Yellow
 
-        try {
-            Test-PCXPackageSource -PackagePath $Folder
+            try {
+                Test-PCXPackageSource -PackagePath $Folder
+            }
+            catch {
+                Clear-PackageMetadata
+                $script:LastLoadedSourcePath = ''
+
+                [System.Windows.MessageBox]::Show(
+                    $_.Exception.Message,
+                    "Validation Error"
+                )
+                return
+            }
+
+            $txtSourcePath.Text = $Folder
+
+            try {
+                $Metadata = Get-PCXSourceMetadata -SourcePath $Folder
+
+                $txtCompany.Text = $Metadata.Company
+                $txtProduct.Text = $Metadata.Product
+                $txtVersion.Text = $Metadata.Version
+                $txtPackageName.Text = "PKG $($Metadata.Name)"
+
+                $script:LastLoadedSourcePath = $Folder
+
+                Write-GUIStatus "Package information loaded."
+            }
+            catch {
+                Clear-PackageMetadata
+                $script:LastLoadedSourcePath = ''
+
+                [System.Windows.MessageBox]::Show(
+                    $_.Exception.Message,
+                    "Metadata Error"
+                )
+                return
+            }
         }
-        catch {
-            Clear-PackageMetadata
-            $script:LastLoadedSourcePath = ''
-
-            [System.Windows.MessageBox]::Show(
-                $_.Exception.Message,
-                "Validation Error"
-            )
-            return
-        }
-
-        $txtSourcePath.Text = $Folder
-
-        try {
-            $Metadata = Get-PCXPackageMetadata -PackagePath $Folder
-
-            $txtCompany.Text = $Metadata.Company
-            $txtProduct.Text = $Metadata.Product
-            $txtVersion.Text = $Metadata.Version
-            $txtPackageName.Text = $Metadata.PackageName
-
-            $script:LastLoadedSourcePath = $Folder
-
-            Write-GUIStatus "Package information loaded."
-        }
-        catch {
-            Clear-PackageMetadata
-            $script:LastLoadedSourcePath = ''
-
-            [System.Windows.MessageBox]::Show(
-                $_.Exception.Message,
-                "Metadata Error"
-            )
-            return
-        }
-    }
-})
+    })
 
 # ------------------------------------------------------------
 # Create Package
@@ -188,52 +186,50 @@ $btnBrowse.Add_Click({
 
 $btnCreatePackage.Add_Click({
 
-    try {
+        try {
 
-        if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+            if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+                [System.Windows.MessageBox]::Show(
+                    "Please select a package source path.",
+                    "Validation Error"
+                )
+                return
+            }
+
+            $btnCreatePackage.IsEnabled = $false
+            $Window.Cursor = [System.Windows.Input.Cursors]::Wait
+            # Enable below line only if cursor doesnt switch
+            #[System.Windows.Forms.Application]::DoEvents()
+
+            Write-GUIStatus "Creating package..."
+            Write-GUIStatus "Please do not close the window."
+
+            Create-PCXCMPackage -Path $txtSourcePath.Text -DPGroup $cmbDPGroup.SelectedItem
+
+            Write-GUIStatus "Package created successfully."
+
             [System.Windows.MessageBox]::Show(
-                "Please select a package source path.",
-                "Validation Error"
+                "Package created successfully.",
+                "PCXLab SCCM"
             )
-            return
+
+        }
+        catch {
+
+            Write-GUIStatus $_.Exception.Message
+
+            [System.Windows.MessageBox]::Show(
+                $_.Exception.Message,
+                "Package Creation Failed"
+            )
+
+        }
+        finally {
+            $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
+            $btnCreatePackage.IsEnabled = $true
         }
 
-        $btnCreatePackage.IsEnabled = $false
-        $Window.Cursor = [System.Windows.Input.Cursors]::Wait
-        # Enable below line only if cursor doesnt switch
-        #[System.Windows.Forms.Application]::DoEvents()
-
-        Write-GUIStatus "Creating package..."
-        Write-GUIStatus "Please do not close the window."
-
-        Create-PCXCMPackage `
-            -Path $txtSourcePath.Text `
-            -DPGroup $cmbDPGroup.SelectedItem
-
-        Write-GUIStatus "Package created successfully."
-
-        [System.Windows.MessageBox]::Show(
-            "Package created successfully.",
-            "PCXLab SCCM"
-        )
-
-    }
-    catch {
-
-        Write-GUIStatus $_.Exception.Message
-
-        [System.Windows.MessageBox]::Show(
-            $_.Exception.Message,
-            "Package Creation Failed"
-        )
-
-    }
-    finally {
-        $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
-        $btnCreatePackage.IsEnabled = $true
-    }
-
-})
+    })
 
 # ------------------------------------------------------------
 # Show Window

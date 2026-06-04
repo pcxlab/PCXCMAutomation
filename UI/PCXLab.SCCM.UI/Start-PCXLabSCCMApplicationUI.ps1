@@ -6,6 +6,8 @@ $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 . (Join-Path $ScriptRoot "Functions\Import-PCXLabSCCMModule.ps1")
 . (Join-Path $ScriptRoot "Functions\Initialize-PCXLabSCCMUI.ps1")
+. (Join-Path $ScriptRoot "Functions\Get-PCXSourceMetadata.ps1")
+
 
 try {
     #Initialize-PCXLabSCCMUI

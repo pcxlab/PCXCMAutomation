@@ -3,7 +3,7 @@ Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 
-. (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXApplicationMetadata.ps1")
+. (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXSourceMetadata.ps1")
 . (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Get-PCXCMDPGroups.ps1")
 . (Join-Path (Split-Path $PSScriptRoot -Parent) "Functions\Test-PCXPackageSource.ps1")
 
@@ -65,47 +65,47 @@ Write-GUIStatus "Ready"
 
 $txtSourcePath.Add_TextChanged({
 
-    if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
-        Clear-ApplicationMetadata
-        $script:LastLoadedSourcePath = ''
-        $txtStatus.Clear()
-        Write-GUIStatus "Ready"
-    }
-})
+        if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+            Clear-ApplicationMetadata
+            $script:LastLoadedSourcePath = ''
+            $txtStatus.Clear()
+            Write-GUIStatus "Ready"
+        }
+    })
 
 $txtSourcePath.Add_LostFocus({
 
-    $CurrentPath = $txtSourcePath.Text.Trim()
+        $CurrentPath = $txtSourcePath.Text.Trim()
 
-    if ([string]::IsNullOrWhiteSpace($CurrentPath)) {
-        return
-    }
+        if ([string]::IsNullOrWhiteSpace($CurrentPath)) {
+            return
+        }
 
-    if ($CurrentPath -eq $script:LastLoadedSourcePath) {
-        return
-    }
+        if ($CurrentPath -eq $script:LastLoadedSourcePath) {
+            return
+        }
 
-    try {
-        Test-PCXPackageSource -PackagePath $CurrentPath
+        try {
+            Test-PCXPackageSource -PackagePath $CurrentPath
 
-        $Metadata = Get-PCXApplicationMetadata -ApplicationPath $CurrentPath
+            $Metadata = Get-PCXSourceMetadata -SourcePath $Folder
 
-        $txtCompany.Text = $Metadata.Company
-        $txtProduct.Text = $Metadata.Product
-        $txtVersion.Text = $Metadata.Version
-        $txtApplicationName.Text = $Metadata.ApplicationName
+            $txtCompany.Text = $Metadata.Company
+            $txtProduct.Text = $Metadata.Product
+            $txtVersion.Text = $Metadata.Version
+            $txtApplicationName.Text = "APP $($Metadata.Name)"
 
-        $script:LastLoadedSourcePath = $CurrentPath
+            $script:LastLoadedSourcePath = $CurrentPath
 
-        Write-GUIStatus "Application information loaded."
-    }
-    catch {
-        Clear-ApplicationMetadata
-        $script:LastLoadedSourcePath = ''
-        Write-GUIStatus "Invalid Application source."
-    }
+            Write-GUIStatus "Application information loaded."
+        }
+        catch {
+            Clear-ApplicationMetadata
+            $script:LastLoadedSourcePath = ''
+            Write-GUIStatus "Invalid Application source."
+        }
 
-})
+    })
 
 # ------------------------------------------------------------
 # Distribution Point Groups
@@ -127,57 +127,58 @@ if ($cmbDPGroup.Items.Count -gt 0) {
 
 $btnBrowse.Add_Click({
 
-    $Dialog = New-Object System.Windows.Forms.OpenFileDialog
-    $Dialog.Title = "Select any file inside Application Folder"
-    $Dialog.Filter = "All Files (*.*)|*.*"
+        $Dialog = New-Object System.Windows.Forms.OpenFileDialog
+        $Dialog.Title = "Select any file inside Application Folder"
+        $Dialog.Filter = "All Files (*.*)|*.*"
 
-    if ($Dialog.ShowDialog() -eq "OK") {
+        if ($Dialog.ShowDialog() -eq "OK") {
 
-        $Folder = Split-Path $Dialog.FileName -Parent
+            $Folder = Split-Path $Dialog.FileName -Parent
 
-        Write-Host "Selected Folder: $Folder" -ForegroundColor Yellow
-        Write-Host "Test-Path Result: $(Test-Path $Folder)" -ForegroundColor Yellow
+            Write-Host "Selected Folder: $Folder" -ForegroundColor Yellow
+            Write-Host "Test-Path Result: $(Test-Path $Folder)" -ForegroundColor Yellow
 
-        try {
-            Test-PCXPackageSource -PackagePath $Folder
+            try {
+                Test-PCXPackageSource -PackagePath $Folder
+            }
+            catch {
+                Clear-ApplicationMetadata
+                $script:LastLoadedSourcePath = ''
+
+                [System.Windows.MessageBox]::Show(
+                    $_.Exception.Message,
+                    "Validation Error"
+                )
+                return
+            }
+
+            $txtSourcePath.Text = $Folder
+
+            try {
+                $Metadata = Get-PCXSourceMetadata -SourcePath $Folder
+
+
+                $txtCompany.Text = $Metadata.Company
+                $txtProduct.Text = $Metadata.Product
+                $txtVersion.Text = $Metadata.Version
+                $txtApplicationName.Text = "APP $($Metadata.Name)"
+
+                $script:LastLoadedSourcePath = $Folder
+
+                Write-GUIStatus "Application information loaded."
+            }
+            catch {
+                Clear-ApplicationMetadata
+                $script:LastLoadedSourcePath = ''
+
+                [System.Windows.MessageBox]::Show(
+                    $_.Exception.Message,
+                    "Metadata Error"
+                )
+                return
+            }
         }
-        catch {
-            Clear-ApplicationMetadata
-            $script:LastLoadedSourcePath = ''
-
-            [System.Windows.MessageBox]::Show(
-                $_.Exception.Message,
-                "Validation Error"
-            )
-            return
-        }
-
-        $txtSourcePath.Text = $Folder
-
-        try {
-            $Metadata = Get-PCXApplicationMetadata -ApplicationPath $Folder
-
-            $txtCompany.Text = $Metadata.Company
-            $txtProduct.Text = $Metadata.Product
-            $txtVersion.Text = $Metadata.Version
-            $txtApplicationName.Text = $Metadata.ApplicationName
-
-            $script:LastLoadedSourcePath = $Folder
-
-            Write-GUIStatus "Application information loaded."
-        }
-        catch {
-            Clear-ApplicationMetadata
-            $script:LastLoadedSourcePath = ''
-
-            [System.Windows.MessageBox]::Show(
-                $_.Exception.Message,
-                "Metadata Error"
-            )
-            return
-        }
-    }
-})
+    })
 
 # ------------------------------------------------------------
 # Create Application
@@ -185,50 +186,50 @@ $btnBrowse.Add_Click({
 
 $btnCreateApplication.Add_Click({
 
-    try {
+        try {
 
-        if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+            if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+                [System.Windows.MessageBox]::Show(
+                    "Please select a Application source path.",
+                    "Validation Error"
+                )
+                return
+            }
+
+            $btnCreateApplication.IsEnabled = $false
+            $Window.Cursor = [System.Windows.Input.Cursors]::Wait
+            # Enable below line only if cursor doesnt switch
+            #[System.Windows.Forms.Application]::DoEvents()
+
+            Write-GUIStatus "Creating Application..."
+            Write-GUIStatus "Please do not close the window."
+
+            Create-PCXCMApplication -Path $txtSourcePath.Text -DPGroup $cmbDPGroup.SelectedItem
+
+            Write-GUIStatus "Application created successfully."
+
             [System.Windows.MessageBox]::Show(
-                "Please select a Application source path.",
-                "Validation Error"
+                "Application created successfully.",
+                "PCXLab SCCM"
             )
-            return
+
+        }
+        catch {
+
+            Write-GUIStatus $_.Exception.Message
+
+            [System.Windows.MessageBox]::Show(
+                $_.Exception.Message,
+                "Application Creation Failed"
+            )
+
+        }
+        finally {
+            $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
+            $btnCreateApplication.IsEnabled = $true
         }
 
-        $btnCreateApplication.IsEnabled = $false
-        $Window.Cursor = [System.Windows.Input.Cursors]::Wait
-        # Enable below line only if cursor doesnt switch
-        #[System.Windows.Forms.Application]::DoEvents()
-
-        Write-GUIStatus "Creating Application..."
-        Write-GUIStatus "Please do not close the window."
-
-        Create-PCXCMApplication -Path $txtSourcePath.Text -DPGroup $cmbDPGroup.SelectedItem
-
-        Write-GUIStatus "Application created successfully."
-
-        [System.Windows.MessageBox]::Show(
-            "Application created successfully.",
-            "PCXLab SCCM"
-        )
-
-    }
-    catch {
-
-        Write-GUIStatus $_.Exception.Message
-
-        [System.Windows.MessageBox]::Show(
-            $_.Exception.Message,
-            "Application Creation Failed"
-        )
-
-    }
-    finally {
-        $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
-        $btnCreateApplication.IsEnabled = $true
-    }
-
-})
+    })
 
 # ------------------------------------------------------------
 # Show Window
