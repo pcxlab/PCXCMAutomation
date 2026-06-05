@@ -8,7 +8,7 @@ function Get-PCXCollectionNames {
         Available = "$PackageName [AVAILABLE]"
         Install   = "$PackageName [INSTALL]"
         Uninstall = "$PackageName [UNINSTALL]"
-        Exception = "$PackageName [EXCEPTION]"
+        Exception = "$PackageName [EXCLUDE]"
     }
 }
 

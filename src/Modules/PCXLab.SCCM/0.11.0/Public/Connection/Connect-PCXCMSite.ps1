@@ -15,27 +15,49 @@ function Connect-PCXCMSite {
     }
 
     process {
+
         try {
-            # Always reload ConfigurationManager module
-            $CMModulePath = Join-Path (Split-Path $ENV:SMS_ADMIN_UI_PATH -Parent) "ConfigurationManager.psd1"
 
-            Import-Module $CMModulePath -Force -ErrorAction Stop
+            # Validate SCCM environment
+            Initialize-PCXCMEnvironment
 
-            # Verify CMSite provider loaded
+            # Verify CMSite provider
             if (-not (Get-PSProvider CMSite -ErrorAction SilentlyContinue)) {
                 throw "CMSite provider failed to load."
             }
 
-            # Create PSDrive if missing
-            $existingDrive = Get-PSDrive -Name $SiteCode -PSProvider CMSite -ErrorAction SilentlyContinue
+            # Create CMSite drive if missing
+            $ExistingDrive = Get-PSDrive `
+                -Name $SiteCode `
+                -PSProvider CMSite `
+                -ErrorAction SilentlyContinue
 
-            if (-not $existingDrive) {
-                Write-Verbose "PCXLab - Creating CMSite drive $SiteCode"
+            if (-not $ExistingDrive) {
+
+                Write-Verbose "PCXLab - Creating CMSite drive [$SiteCode]."
+
                 $null = New-PSDrive -Name $SiteCode -PSProvider CMSite -Root $ProviderMachineName -ErrorAction Stop
             }
 
-            # Switch location
+            # Switch to site drive
             Set-Location "${SiteCode}:\"
+
+            # Verify location change succeeded
+            $CurrentLocation = (Get-Location).Path
+
+            if ($CurrentLocation -notlike "$SiteCode*") {
+                throw "Failed to switch to SCCM Site Drive."
+            }
+
+            # Verify SCCM connectivity
+            try {
+
+               $null = Get-CMApplication -Fast | Select-Object -First 1 
+            }
+            catch {
+
+                throw "Connected to SCCM Site but SCCM query failed. $($_.Exception.Message)"
+            }
 
             [PSCustomObject]@{
                 Success             = $true
@@ -46,39 +68,21 @@ function Connect-PCXCMSite {
             }
         }
         catch {
+
             $OperationSucceeded = $false
-            Write-PCXLog -Message "Failed to connect to Configuration Manager site. $($_.Exception.Message)" -Level ERROR
+
+            Write-PCXLog `
+                -Message "Failed to connect to Configuration Manager site. $($_.Exception.Message)" `
+                -Level ERROR
+
             throw
         }
     }
 
     end {
+
         if ($OperationSucceeded) {
             Write-PCXOperationEnd -Status Success
         }
     }
 }
-<#
-.SYNOPSIS
-Imports the Configuration Manager module, connects to the CMSite drive,
-and sets the current location to the site drive.
-
-.DESCRIPTION
-This function loads the Microsoft Configuration Manager PowerShell module
-(if not already loaded), creates the CMSite PSDrive if required, and
-switches the current location into the site drive.
-
-.PARAMETER SiteCode
-Configuration Manager site code.
-Example: ABC
-
-.PARAMETER ProviderMachineName
-Primary site server / SMS Provider machine name.
-
-.EXAMPLE
-Connect-PCXCMSite -SiteCode ABC -ProviderMachineName CM01
-
-.NOTES
-PCXLab Automation Framework
-#>
-

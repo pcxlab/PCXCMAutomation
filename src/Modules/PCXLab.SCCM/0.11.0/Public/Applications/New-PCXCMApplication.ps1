@@ -36,11 +36,31 @@ function New-PCXCMApplication {
 
             Write-PCXLog "Creating application: $Name"
 
+                $ApplicationName = $Name
+                # Description will be calleer -Description $Description
+                # Publisher is caller -Publisher $Publisher 
+                # Sofware version is caller -SoftwareVersion $SoftwareVersion 
+                $OptionalReference = "Reference"
+                # Caller -ReleaseDate $ReleaseDate 
+                # -AutoInstall $true 
+                $LocalizedName = $ApplicationName
+                
+                $UserDocumentation = "https://mphasis.com/"
+                #$UserDocumentation = "https://contoso.com/content" 
+                $DocumentLinkText = "Mphasis" 
+                $LocalizedDescription = $ApplicationName 
+                $Keyword = $ApplicationName 
+                $PrivacyUrl = "https://mphasis.com/"  
+                #$PrivacyUrl = "https://contoso.com/library/privacy" 
+                $IsFeatured = $false 
+                # Caller -IconLocationFile "$Iconlocationfile"
+            
+
             if ($Iconlocationfile) {
-            $null = New-CMApplication -Name "$Name" -Description "$Description" -Publisher "$Publisher" -SoftwareVersion "$SoftwareVersion" -OptionalReference "Reference" -ReleaseDate "$ReleaseDate" -AutoInstall $true -LocalizedName "Application01" -UserDocumentation "https://contoso.com/content" -LinkText "For more information" -LocalizedDescription "New Localized Application" -Keyword "application" -PrivacyUrl "https://contoso.com/library/privacy" -IsFeatured $true -IconLocationFile "$Iconlocationfile"
+            $null = New-CMApplication -Name $ApplicationName -Description $Description -Publisher $Publisher -SoftwareVersion $SoftwareVersion -OptionalReference $OptionalReference -ReleaseDate $ReleaseDate -AutoInstall $true -LocalizedName $LocalizedName -UserDocumentation $UserDocumentation -LinkText $DocumentLinkText -LocalizedDescription $LocalizedDescription -Keyword $Keyword -PrivacyUrl $PrivacyUrl -IsFeatured $IsFeatured -IconLocationFile "$Iconlocationfile"
             }
             else {
-            $null = New-CMApplication -Name "$Name" -Description "$Description" -Publisher "$Publisher" -SoftwareVersion "$SoftwareVersion" -OptionalReference "Reference" -ReleaseDate "$ReleaseDate" -AutoInstall $true -LocalizedName "Application01" -UserDocumentation "https://contoso.com/content" -LinkText "For more information" -LocalizedDescription "New Localized Application" -Keyword "application" -PrivacyUrl "https://contoso.com/library/privacy" -IsFeatured $true
+            $null = New-CMApplication -Name $ApplicationName -Description $Description -Publisher $Publisher -SoftwareVersion $SoftwareVersion -OptionalReference $OptionalReference -ReleaseDate $ReleaseDate -AutoInstall $true -LocalizedName $LocalizedName -UserDocumentation $UserDocumentation -LinkText $DocumentLinkText -LocalizedDescription $LocalizedDescription -Keyword $Keyword -PrivacyUrl $PrivacyUrl -IsFeatured $IsFeatured
             }
 
             Write-PCXLog "Application created: $Name"

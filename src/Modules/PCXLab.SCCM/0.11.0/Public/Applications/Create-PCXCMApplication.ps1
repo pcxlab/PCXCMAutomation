@@ -96,7 +96,7 @@ function Create-PCXCMApplication {
             Write-PCXLog "Windows 11 requirement added"
 
             # Step 2.2 - Add Disk Space Requirement
-            $null = Add-PCXDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 20480
+            $null = Add-PCXDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
 
             Write-PCXLog "Disk space requirement added"
 

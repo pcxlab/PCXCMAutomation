@@ -5,7 +5,9 @@ function New-PCXCMDeviceCollection {
         [string]$CollectionName,
 
         [Parameter(Mandatory = $false, Position = 1)]
-        [string]$LimitingCollection = "All Systems"
+        #[string]$LimitingCollection = "All Systems"
+        [string]$LimitingCollection = "AAll Windows Workstation or Professional Systems"
+        
     )
 
     begin {

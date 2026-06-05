@@ -3,21 +3,31 @@ function Ensure-PCXCMConnection {
     [CmdletBinding()]
     param()
 
-    try {
-
-        if (Test-PCXCMConnection) {
-            #Write-PCXLog "Using existing SCCM connection."
-            return
-        }
-        
-        Write-PCXLog "Connecting SCCM Site..."
-        $null = Connect-PCXCMSite
-        Write-PCXLog "Connected SCCM Site."
+    begin {
+        #Write-PCXOperationStart
     }
-    catch {
-        Write-PCXLog -Message "Failed to establish SCCM connection. $($_.Exception.Message)" -Level ERROR
-        throw
+    process {
+        try {
+
+            if (Test-PCXCMConnection) {
+                #Write-PCXLog -Message 'Using existing SCCM connection.'
+                return
+            }
+
+            #Write-PCXLog -Message 'Establishing SCCM connection.'
+            $null = Connect-PCXCMSite
+
+            if (-not (Test-PCXCMConnection)) {
+                throw 'Failed to establish SCCM connection.'
+            }
+            #Write-PCXLog -Message 'SCCM connection established.'
+        }
+        catch {
+            Write-PCXLog -Message $_.Exception.Message -Level ERROR
+            throw
+        }
+    }
+    end {
+        #Write-PCXOperationEnd
     }
 }
-
-

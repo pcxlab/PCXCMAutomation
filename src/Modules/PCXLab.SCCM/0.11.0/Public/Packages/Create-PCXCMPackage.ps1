@@ -63,11 +63,11 @@ function Create-PCXCMPackage {
             $null = Start-PCXCMContentDistribution -PackageName $PackageName -DistributionPointGroupName $DPGroup
 
             New-PCXCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
-            $DeadlineTime = (Get-Date -Hour 20 -Minute 0 -Second 0).AddDays(30)
-            New-PCXDeployments -PackageName $PackageName -Programs $programs -Collections $Collections -DeadlineTime $DeadlineTime
+            $DeadlineTime = (Get-Date -Hour 10 -Minute 0 -Second 0).AddDays(7)
+            New-PCXCMPackageDeployments -PackageName $PackageName -Programs $programs -Collections $Collections -DeadlineTime $DeadlineTime
 
             Set-PCXCollectionRules -Collections $Collections
-
+ 
             $null = Move-PCXCMCollectionsToFolder -Collections $Collections -Meta $meta -ObjectName $PackageName
             $null = Move-PCXCMPackageToFolder -Meta $meta
 
@@ -91,4 +91,5 @@ function Create-PCXCMPackage {
     }
 }
 
+#Create-PCXCMPackage -Path "\\192.168.25.214\Package_Source\Applications\Igor Pavlov\7zip\7zip 26.0.2"
 
