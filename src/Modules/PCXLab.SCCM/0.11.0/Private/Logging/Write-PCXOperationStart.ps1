@@ -1,9 +1,22 @@
 function Write-PCXOperationStart {
 
     [CmdletBinding()]
-    param()
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$OperationName
+    )
 
-    $Operation = Get-PCXOperationName
+    # Use provided name or discover it (expensive)
+    $Operation = if ($OperationName) { 
+        # Apply friendly name mapping if available
+        if ($Global:PCXLogConfiguration.UseFriendlyNames -and $Global:PCXOperationNames.ContainsKey($OperationName)) {
+            $Global:PCXOperationNames[$OperationName]
+        } else {
+            $OperationName
+        }
+    } else { 
+        Get-PCXOperationName 
+    }
 
     $OperationInfo = [PSCustomObject]@{
         Name      = $Operation
@@ -13,7 +26,7 @@ function Write-PCXOperationStart {
 
     $Global:PCXOperationStack.Push($OperationInfo)
 
-    Write-PCXLog "$($Global:PCXLogConfiguration.StartText) - $($Global:PCXLogConfiguration.FrameworkName)"
+    Write-PCXLog "$($Global:PCXLogConfiguration.StartText) - $Operation"
 }
 
 

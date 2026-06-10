@@ -9,74 +9,60 @@ function Write-PCXLog {
         [string]$Level = "INFO"
     )
 
-    # Auto initialize if needed
-    if (-not $Global:PCXLogFile) {
-        Initialize-PCXLogging
-    }
+    # Auto initialize if needed (minimally)
+    if (-not $Global:PCXLogConfiguration) { Initialize-PCXLogConfiguration }
+    if (-not $Global:PCXLogFile) { Initialize-PCXLogging }
 
     $TimeStamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    
+    # Operation context
+    $Operation = "GENERAL"
+    if ($Global:PCXOperationStack -and $Global:PCXOperationStack.Count -gt 0) {
+        $TopOperation = $Global:PCXOperationStack.Peek()
+        if ($TopOperation -and $TopOperation.Name) { $Operation = $TopOperation.Name }
+    }
 
-    if (
-        $Global:PCXOperationStack -and
-        $Global:PCXOperationStack.Count -gt 0
-    ) {
-        $Operation = $Global:PCXOperationStack.Peek().Name
-        $Line = "$TimeStamp [$Operation] [$Level] $Message"
-    }
-    else {
-        #$Line = "$TimeStamp [$Level] $Message"
-        $Line = "$TimeStamp [GENERAL] [$Level] $Message"
-    }
+    $Line = "$TimeStamp [$Operation] [$Level] $Message"
 
     # Determine console color
     $ForegroundColor = $null
 
-    if (
-        $Global:PCXLogConfiguration.TerminalAppearance.EnableCustomColors
-    ) {
-        switch -Regex ($Message) {
-            '^START\b' {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.StartColor
-                break
-            }
-            '^COMPLETED \(SUCCESS\)' {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.SuccessColor
-                break
-            }
-            '^COMPLETED \(FAILED\)' {
-                $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.FailedColor
-                break
-            }
+    if ($Global:PCXLogConfiguration.TerminalAppearance.EnableCustomColors) {
+        $StartPattern = "^$([Regex]::Escape($Global:PCXLogConfiguration.StartText))\b"
+        
+        if ($Message -match $StartPattern) {
+            $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.StartColor
+        }
+        elseif ($Message -like 'COMPLETED (SUCCESS)*') {
+            $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.SuccessColor
+        }
+        elseif ($Message -like 'COMPLETED (FAILED)*') {
+            $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.FailedColor
         }
     }
 
-    # Fall back to standard log level colors
     if (-not $ForegroundColor) {
-        switch ($Level) {
-            "INFO" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.InfoColor }
-            "WARNING" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.WarningColor }
-            "ERROR" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.ErrorColor }
-            "DEBUG" { $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.DebugColor }
+        $colorMap = @{
+            "INFO"    = $Global:PCXLogConfiguration.TerminalAppearance.InfoColor
+            "WARNING" = $Global:PCXLogConfiguration.TerminalAppearance.WarningColor
+            "ERROR"   = $Global:PCXLogConfiguration.TerminalAppearance.ErrorColor
+            "DEBUG"   = $Global:PCXLogConfiguration.TerminalAppearance.DebugColor
         }
+        $ForegroundColor = $colorMap[$Level]
     }
 
     # Ultimate safety fallback
-    if (-not $ForegroundColor) {
-        $ForegroundColor = $Global:PCXLogConfiguration.TerminalAppearance.InfoColor
-    }
+    if (-not $ForegroundColor) { $ForegroundColor = "White" }
+
     # Console output
     Write-Host $Line -ForegroundColor $ForegroundColor
 
     # Write to operational log
-    Add-Content `
-        -Path $Global:PCXLogFile `
-        -Value $Line
+    $Line | Add-Content -Path $Global:PCXLogFile -ErrorAction SilentlyContinue
 
     # Write errors to separate error log
     if ($Level -eq "ERROR") {
-        Add-Content `
-            -Path $Global:PCXErrorLogFile `
-            -Value $Line
+        $Line | Add-Content -Path $Global:PCXErrorLogFile -ErrorAction SilentlyContinue
     }
 }
 

@@ -10,16 +10,13 @@ $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 
 try {
-    #Initialize-PCXLabSCCMUI
+    # Initialize UI and Load Module
     [void](Initialize-PCXLabSCCMUI)
-    # $null = Initialize-PCXLabSCCMUI # TEST this if you are using this please 
 }
 catch {
-    [System.Windows.MessageBox]::Show(
-        $_.Exception.Message,
-        "Startup Error"
-    )
+    [System.Windows.MessageBox]::Show($_.Exception.Message, "Startup Error")
     return
 }
 
+# Launch Application Window
 & (Join-Path $ScriptRoot "Scripts\ApplicationWindow.ps1")

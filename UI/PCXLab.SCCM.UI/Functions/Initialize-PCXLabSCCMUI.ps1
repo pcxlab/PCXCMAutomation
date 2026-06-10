@@ -1,24 +1,16 @@
 function Initialize-PCXLabSCCMUI {
-
     [CmdletBinding()]
     param()
 
     $LoadedModule = Import-PCXLabSCCMModule
 
-    if (-not (Get-Command Create-PCXCMPackage -ErrorAction SilentlyContinue)) {
-        throw "Create-Package function not found."
+    $RequiredCommands = @("Create-PCXCMPackage", "Create-PCXCMApplication")
+    foreach ($Cmd in $RequiredCommands) {
+        if (-not (Get-Command $Cmd -ErrorAction SilentlyContinue)) {
+            throw "Required command '$Cmd' not found in loaded module."
+        }
     }
 
-    if (-not (Get-Command Create-PCXCMApplication -ErrorAction SilentlyContinue)) {
-        throw "Create-Application function not found."
-    }
-
-    #$CreatePackageFile = (Get-Command Create-PCXCMPackage).ScriptBlock.File
-    #$CreateApplicationFile = (Get-Command Create-PCXCMApplication).ScriptBlock.File
-
-    Write-Host "Loaded Module Version : $($LoadedModule.Version)" -ForegroundColor Green
-    Write-Host "Loaded Module Path    : $($LoadedModule.Path)" -ForegroundColor Green
-    #Write-Host "Create-PCXCMPackage   : $CreatePackageFile" -ForegroundColor Cyan
-
+    Write-Host "Loaded Module : $($LoadedModule.Name) v$($LoadedModule.Version)" -ForegroundColor Green
     return $true
 }

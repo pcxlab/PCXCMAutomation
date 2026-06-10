@@ -23,9 +23,16 @@ function Initialize-PCXCMEnvironment {
                 throw "ConfigurationManager module not found: $CMModulePath"
             }
 
-            Write-PCXLog -Message 'Importing ConfigurationManager module.'
+            Write-PCXLog -Message 'Locating ConfigurationManager module.'
 
-            Import-Module $CMModulePath -Force -Global -ErrorAction Stop
+            # Check if module is already loaded
+            if (-not (Get-Module -Name ConfigurationManager)) {
+                Write-PCXLog -Message 'Importing ConfigurationManager module.'
+                Import-Module $CMModulePath -Global -ErrorAction Stop
+            }
+            else {
+                Write-PCXLog -Message 'ConfigurationManager module already loaded.'
+            }
 
             $CMModule = Get-Module ConfigurationManager -ErrorAction SilentlyContinue
 

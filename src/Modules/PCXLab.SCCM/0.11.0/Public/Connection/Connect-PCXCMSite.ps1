@@ -11,7 +11,7 @@ function Connect-PCXCMSite {
 
     begin {
         $OperationSucceeded = $true
-        Write-PCXOperationStart
+        Write-PCXOperationStart -OperationName "Connect-PCXCMSite"
     }
 
     process {
@@ -52,7 +52,7 @@ function Connect-PCXCMSite {
             # Verify SCCM connectivity
             try {
 
-               $null = Get-CMApplication -Fast | Select-Object -First 1 
+               $null = Get-CMSite -SiteCode $SiteCode -ErrorAction Stop
             }
             catch {
 

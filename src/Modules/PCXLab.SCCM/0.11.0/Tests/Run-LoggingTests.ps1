@@ -23,6 +23,6 @@
     Test-PCXLogging
 })
 
-.\Tests\Run-LoggingTests.ps1
+# .\Tests\Run-LoggingTests.ps1
 
 

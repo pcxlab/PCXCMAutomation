@@ -1,5 +1,4 @@
 function Get-PCXSourceMetadata {
-
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -7,21 +6,14 @@ function Get-PCXSourceMetadata {
     )
 
     $clean = $SourcePath.TrimEnd("\")
-
     $parts = $clean -split "\\"
+    if ($parts.Count -lt 3) { throw "Invalid path structure. Path must be like ...\Company\Product\Package" }
 
     $company = $parts[-3]
-
     $raw = $parts[-1]
 
     $versionMatch = [regex]::Match($raw, '\d+(\.\d+)+')
-
-    $version = if ($versionMatch.Success) {
-        $versionMatch.Value
-    }
-    else {
-        "1.0"
-    }
+    $version = if ($versionMatch.Success) { $versionMatch.Value } else { "1.0" }
 
     $product = $raw -replace [regex]::Escape($version), ""
     $product = $product -replace '[\.\-_]', ' '
@@ -31,10 +23,10 @@ function Get-PCXSourceMetadata {
 
     $name = "$company $product $version"
 
-    @{
-        Name     = $name
-        Company  = $company
-        Product  = $product
-        Version  = $version
+    return @{
+        Name    = $name
+        Company = $company
+        Product = $product
+        Version = $version
     }
 }

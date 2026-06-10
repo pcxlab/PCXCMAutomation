@@ -59,126 +59,74 @@ function Write-GUIStatus {
 
 Write-GUIStatus "Ready"
 
+# Helper function to load metadata into UI
+function Update-ApplicationMetadata {
+    param([string]$Path)
+
+    try {
+        Test-PCXPackageSource -PackagePath $Path
+        $Metadata = Get-PCXSourceMetadata -SourcePath $Path
+
+        $txtCompany.Text = $Metadata.Company
+        $txtProduct.Text = $Metadata.Product
+        $txtVersion.Text = $Metadata.Version
+        $txtApplicationName.Text = "APP $($Metadata.Name)"
+
+        $script:LastLoadedSourcePath = $Path
+        Write-GUIStatus "Application information loaded."
+        return $true
+    }
+    catch {
+        Clear-ApplicationMetadata
+        $script:LastLoadedSourcePath = ''
+        Write-GUIStatus "Error: $($_.Exception.Message)"
+        return $false
+    }
+}
+
 # ------------------------------------------------------------
 # Source Path Events
 # ------------------------------------------------------------
 
 $txtSourcePath.Add_TextChanged({
-
-        if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
-            Clear-ApplicationMetadata
-            $script:LastLoadedSourcePath = ''
-            $txtStatus.Clear()
-            Write-GUIStatus "Ready"
-        }
-    })
+    if ([string]::IsNullOrWhiteSpace($txtSourcePath.Text)) {
+        Clear-ApplicationMetadata
+        $script:LastLoadedSourcePath = ''
+        $txtStatus.Clear()
+        Write-GUIStatus "Ready"
+    }
+})
 
 $txtSourcePath.Add_LostFocus({
-
-        $CurrentPath = $txtSourcePath.Text.Trim()
-
-        if ([string]::IsNullOrWhiteSpace($CurrentPath)) {
-            return
-        }
-
-        if ($CurrentPath -eq $script:LastLoadedSourcePath) {
-            return
-        }
-
-        try {
-            Test-PCXPackageSource -PackagePath $CurrentPath
-
-            $Metadata = Get-PCXSourceMetadata -SourcePath $Folder
-
-            $txtCompany.Text = $Metadata.Company
-            $txtProduct.Text = $Metadata.Product
-            $txtVersion.Text = $Metadata.Version
-            $txtApplicationName.Text = "APP $($Metadata.Name)"
-
-            $script:LastLoadedSourcePath = $CurrentPath
-
-            Write-GUIStatus "Application information loaded."
-        }
-        catch {
-            Clear-ApplicationMetadata
-            $script:LastLoadedSourcePath = ''
-            Write-GUIStatus "Invalid Application source."
-        }
-
-    })
+    $CurrentPath = $txtSourcePath.Text.Trim()
+    if ([string]::IsNullOrWhiteSpace($CurrentPath) -or $CurrentPath -eq $script:LastLoadedSourcePath) { return }
+    
+    Update-ApplicationMetadata -Path $CurrentPath
+})
 
 # ------------------------------------------------------------
 # Distribution Point Groups
 # ------------------------------------------------------------
 
 $DPGroups = Get-PCXCMDPGroups
-
-foreach ($DPGroup in $DPGroups) {
-    [void]$cmbDPGroup.Items.Add($DPGroup)
-}
-
-if ($cmbDPGroup.Items.Count -gt 0) {
-    $cmbDPGroup.SelectedIndex = 0
-}
+foreach ($DPGroup in $DPGroups) { [void]$cmbDPGroup.Items.Add($DPGroup) }
+if ($cmbDPGroup.Items.Count -gt 0) { $cmbDPGroup.SelectedIndex = 0 }
 
 # ------------------------------------------------------------
 # Browse
 # ------------------------------------------------------------
 
 $btnBrowse.Add_Click({
+    $Dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $Dialog.Title = "Select any file inside Application Folder"
+    $Dialog.Filter = "All Files (*.*)|*.*"
 
-        $Dialog = New-Object System.Windows.Forms.OpenFileDialog
-        $Dialog.Title = "Select any file inside Application Folder"
-        $Dialog.Filter = "All Files (*.*)|*.*"
-
-        if ($Dialog.ShowDialog() -eq "OK") {
-
-            $Folder = Split-Path $Dialog.FileName -Parent
-
-            Write-Host "Selected Folder: $Folder" -ForegroundColor Yellow
-            Write-Host "Test-Path Result: $(Test-Path $Folder)" -ForegroundColor Yellow
-
-            try {
-                Test-PCXPackageSource -PackagePath $Folder
-            }
-            catch {
-                Clear-ApplicationMetadata
-                $script:LastLoadedSourcePath = ''
-
-                [System.Windows.MessageBox]::Show(
-                    $_.Exception.Message,
-                    "Validation Error"
-                )
-                return
-            }
-
-            $txtSourcePath.Text = $Folder
-
-            try {
-                $Metadata = Get-PCXSourceMetadata -SourcePath $Folder
-
-
-                $txtCompany.Text = $Metadata.Company
-                $txtProduct.Text = $Metadata.Product
-                $txtVersion.Text = $Metadata.Version
-                $txtApplicationName.Text = "APP $($Metadata.Name)"
-
-                $script:LastLoadedSourcePath = $Folder
-
-                Write-GUIStatus "Application information loaded."
-            }
-            catch {
-                Clear-ApplicationMetadata
-                $script:LastLoadedSourcePath = ''
-
-                [System.Windows.MessageBox]::Show(
-                    $_.Exception.Message,
-                    "Metadata Error"
-                )
-                return
-            }
-        }
-    })
+    if ($Dialog.ShowDialog() -eq "OK") {
+        $Folder = Split-Path $Dialog.FileName -Parent
+        $txtSourcePath.Text = $Folder
+        Update-ApplicationMetadata -Path $Folder
+    }
+})
 
 # ------------------------------------------------------------
 # Create Application

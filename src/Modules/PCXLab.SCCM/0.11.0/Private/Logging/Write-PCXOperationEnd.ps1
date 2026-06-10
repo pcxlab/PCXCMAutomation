@@ -2,9 +2,11 @@ function Write-PCXOperationEnd {
 
     [CmdletBinding()]
     param(
-
         [ValidateSet("Success", "Failed")]
-        [string]$Status = "Success"
+        [string]$Status = "Success",
+
+        [Parameter(Mandatory = $false)]
+        [string]$Message
     )
 
     if (
@@ -29,16 +31,15 @@ function Write-PCXOperationEnd {
             $DurationText = "{0} min {1:N2} sec" -f $Minutes, $Seconds
         }
 
-        $TimeStamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $StatusText = "COMPLETED ($($Status.ToUpper()))"
+        $FinalMessage = if ($Message) { "$StatusText - $Message ($DurationText)" } else { "$StatusText ($DurationText)" }
 
-        $Line = "$TimeStamp [$($Operation.Name)] [INFO] COMPLETED ($($Status.ToUpper())) - $DurationText - $($Global:PCXLogConfiguration.Website)"
-        
-        Write-Host $Line -ForegroundColor $Global:PCXLogConfiguration.TerminalAppearance.SuccessColor
+        $LogLevel = if ($Status -eq "Success") { "INFO" } else { "ERROR" }
 
-        Add-Content -Path $Global:PCXLogFile -Value $Line
+        Write-PCXLog -Message $FinalMessage -Level $LogLevel
     }
     else {
-        Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation - $($Global:PCXLogConfiguration.Website)"
+        Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation stack sync issue." -Level WARNING
     }
 }
 
