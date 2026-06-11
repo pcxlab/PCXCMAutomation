@@ -32,15 +32,24 @@ function Write-PCXOperationEnd {
         }
 
         $StatusText = "COMPLETED ($($Status.ToUpper()))"
-        $FinalMessage = if ($Message) { "$StatusText - $Message ($DurationText)" } else { "$StatusText ($DurationText)" }
+        #$FinalMessage = if ($Message) { "$StatusText - $Message ($DurationText)" } else { "$StatusText ($DurationText)" }
+
+        $FinalMessage = if ($Message) {
+            "$StatusText - $Message ($DurationText) - $($Global:PCXLogConfiguration.Website)"
+        }
+        else {
+            "$StatusText ($DurationText) - $($Global:PCXLogConfiguration.Website)"
+        }
 
         $LogLevel = if ($Status -eq "Success") { "INFO" } else { "ERROR" }
 
         Write-PCXLog -Message $FinalMessage -Level $LogLevel
     }
     else {
-        Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation stack sync issue." -Level WARNING
+        # Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation stack sync issue." -Level WARNING
+        Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation stack sync issue. - $($Global:PCXLogConfiguration.Website)" -Level WARNING
     }
 }
+
 
 

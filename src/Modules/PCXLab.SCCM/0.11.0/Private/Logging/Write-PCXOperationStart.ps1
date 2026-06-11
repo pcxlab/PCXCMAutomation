@@ -26,7 +26,8 @@ function Write-PCXOperationStart {
 
     $Global:PCXOperationStack.Push($OperationInfo)
 
-    Write-PCXLog "$($Global:PCXLogConfiguration.StartText) - $Operation"
+    #Write-PCXLog "$($Global:PCXLogConfiguration.StartText) - $Operation"
+    Write-PCXLog "$($Global:PCXLogConfiguration.StartText) - $Operation - $($Global:PCXLogConfiguration.FrameworkName)"
 }
 
 
