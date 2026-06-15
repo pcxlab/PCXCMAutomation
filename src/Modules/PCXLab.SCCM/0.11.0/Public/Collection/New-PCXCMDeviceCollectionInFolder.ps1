@@ -42,7 +42,7 @@ function New-PCXCMDeviceCollectionInFolder {
                 Write-PCXLog "Folder path '$FolderPath' verified or created successfully."
             }
 
-            $CollectionObject = Get-CMDeviceCollection -Name $CollectionName -ErrorAction SilentlyContinue
+            $CollectionObject = Get-PCXCMCachedCollection | Where-Object Name -eq $CollectionName | Select-Object -First 1
             $CollectionCreated = $false
 
             if (-not $CollectionObject) {
@@ -54,6 +54,10 @@ function New-PCXCMDeviceCollectionInFolder {
                 }
 
                 $CollectionObject = Get-CMDeviceCollection -Name $CollectionName -ErrorAction Stop
+
+                if ($CollectionObject) {
+                    $Global:PCXCMRuntimeCache.Collections += $CollectionObject
+                }
             }
             else {
                 Write-PCXLog "Device collection already exists: $CollectionName"

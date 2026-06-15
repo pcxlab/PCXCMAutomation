@@ -3,22 +3,26 @@ function Get-PCXCMCollectionDeploymentCount {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $Collection
+        $Collection,
+
+        [Parameter(Mandatory)]
+        $Deployments
     )
 
     try {
 
-        $Deployments = Get-CMDeployment `
-            -ErrorAction SilentlyContinue |
-            Where-Object {
-                $_.CollectionID -eq $Collection.CollectionID
-            }
+        $ResultDeployments = $Deployments | Where-Object {
+            $_.CollectionID -eq $Collection.CollectionID
+        }
 
-        return @($Deployments).Count
+        return @($ResultDeployments).Count
     }
     catch {
 
-        Write-PCXLog -Message $_.Exception.Message -Level ERROR
+        Write-PCXLog `
+            -Message $_.Exception.Message `
+            -Level ERROR
+
         throw
     }
 }

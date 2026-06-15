@@ -19,15 +19,13 @@ function Get-PCXCMApplicationCleanupInfo {
 
             Ensure-PCXCMConnection
 
-            if ($PSCmdlet.ParameterSetName -eq 'ApplicationName') {
+            $AllApplications = Get-PCXCMCachedApplication
 
-                $Application = Get-CMApplication -Name $ApplicationName -Fast
+            if ($PSCmdlet.ParameterSetName -eq 'ApplicationName') {
+                $Application = $AllApplications | Where-Object { $_.LocalizedDisplayName -eq $ApplicationName } | Select-Object -First 1
             }
             else {
-
-                $Application = Get-CMApplication -Fast | Where-Object {
-                    $_.SDMPackageXML -match [regex]::Escape($ApplicationPath)
-                }
+                $Application = $AllApplications | Where-Object { $_.SDMPackageXML -match [regex]::Escape($ApplicationPath) } | Select-Object -First 1
             }
 
             if (-not $Application) {
@@ -40,21 +38,19 @@ function Get-PCXCMApplicationCleanupInfo {
 
             Write-PCXLog -Message "Resolved Application: $($Application.LocalizedDisplayName)"
 
-            $Deployments = Get-CMApplicationDeployment -Name $Application.LocalizedDisplayName
+            $Deployments = Get-PCXCMCachedDeployment | Where-Object {
+                $_.SoftwareName -eq $Application.LocalizedDisplayName
+            }
 
             Write-PCXLog -Message "Found $(@($Deployments).Count) Deployment(s)"
 
-            $Collections = Get-CMDeviceCollection -Name "$($Application.LocalizedDisplayName)*"
+            $Collections = Get-PCXCMCachedCollection | Where-Object {
+                $_.Name -like "$($Application.LocalizedDisplayName)*"
+            }
 
             Write-PCXLog -Message "Found $(@($Collections).Count) Collection(s)"
 
-            $CollectionFolder = Get-CMFolder -Name $Application.LocalizedDisplayName | Where-Object {
-                $_.ObjectTypeName -eq 'SMS_Collection_Device'
-            }
-
-            if (@($CollectionFolder).Count -gt 1) {
-                throw 'Multiple collection folders found.'
-            }
+            $CollectionFolder = Get-PCXCMCollectionFolder -Name $Application.LocalizedDisplayName
 
             if ($CollectionFolder) {
                 Write-PCXLog -Message "Found Collection Folder: $($CollectionFolder.Name)"

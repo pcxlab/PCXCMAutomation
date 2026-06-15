@@ -6,45 +6,28 @@ function New-PCXCMDeviceCollection {
 
         [Parameter(Mandatory = $false, Position = 1)]
         #[string]$LimitingCollection = "All Systems"
-        [string]$LimitingCollection = "AAll Windows Workstation or Professional Systems"
-        
+        [string]$LimitingCollection = "All Windows Workstation or Professional Systems"
     )
 
     begin {
-
         Write-PCXOperationStart
     }
 
     process {
-
         try {
-
-            $existingCollection = Get-CMDeviceCollection `
-                -Name $CollectionName `
-                -ErrorAction SilentlyContinue
-
-            if ($existingCollection) {
-
+            if (Test-PCXCMCollectionExists -CollectionName $CollectionName) {
                 throw "Device collection already exists: $CollectionName"
             }
-
             Write-PCXLog "Creating device collection: $CollectionName"
-
-            $null = New-CMDeviceCollection `
-                -Name $CollectionName `
-                -LimitingCollectionName $LimitingCollection
-
+            $null = New-CMDeviceCollection -Name $CollectionName -LimitingCollectionName $LimitingCollection
             Write-PCXLog "Device collection created: $CollectionName"
         }
         catch {
-Write-PCXLog -Message "Failed to create device collection: $CollectionName. $_" -Level ERROR
-
+            Write-PCXLog -Message "Failed to create device collection: $CollectionName. $_" -Level ERROR
             throw
         }
     }
-
     end {
-
         Write-PCXOperationEnd -Status Success
     }
 }

@@ -3,14 +3,17 @@ function Get-PCXCMDeploymentCollectionMemberCount {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $Deployment
+        $Deployment,
+
+        [Parameter(Mandatory)]
+        $Collections
     )
 
     try {
 
-        $Collection = Get-CMCollection `
-            -Id $Deployment.CollectionID `
-            -ErrorAction SilentlyContinue
+        $Collection = $Collections | Where-Object {
+            $_.CollectionID -eq $Deployment.CollectionID
+        } | Select-Object -First 1
 
         if (-not $Collection) {
             return 0

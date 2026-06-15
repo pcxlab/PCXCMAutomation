@@ -24,20 +24,14 @@ function New-PCXCMPackage {
     }
     process {
         try {
-            # Assign package object to variable
-            $Package = Get-CMPackage -Name $PackageName -Fast -ErrorAction SilentlyContinue
-
-            # Check whether package already exists
-            if ($Package) {
-                Write-PCXLog "Package already exists: $PackageName" -Level WARNING
-                return
+            if (Test-PCXCMPackageExists -PackageName $PackageName) {
+                throw "Package already exists: $PackageName"
             }
-
             Write-PCXLog "Creating package: $PackageName"
-
-            $null = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
-
+            #New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
+            $Package = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
             Write-PCXLog "Package created: $PackageName"
+            return $Package
         }
         catch {
             Write-PCXLog -Message "Failed to create package $PackageName. $($_.Exception.Message)" -Level ERROR

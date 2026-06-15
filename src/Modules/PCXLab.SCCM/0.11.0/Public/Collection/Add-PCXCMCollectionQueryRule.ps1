@@ -13,20 +13,14 @@ function Add-PCXCMCollectionQueryRule {
     )
 
     begin {
-
         Write-PCXOperationStart
     }
 
     process {
-
         try {
-
-            $ExistingCollection = Get-CMDeviceCollection `
-                -Name $CollectionName `
-                -ErrorAction SilentlyContinue
+            $ExistingCollection = Get-PCXCMCachedCollection | Where-Object Name -eq $CollectionName | Select-Object -First 1
 
             if (-not $ExistingCollection) {
-
                 throw "Collection not found: $CollectionName"
             }
 
@@ -40,14 +34,11 @@ function Add-PCXCMCollectionQueryRule {
             Write-PCXLog "Query rule added: $RuleName"
         }
         catch {
-Write-PCXLog -Message "Failed to add query rule '$RuleName' to collection '$CollectionName'. $_" -Level ERROR
-
+            Write-PCXLog -Message "Failed to add query rule '$RuleName' to collection '$CollectionName'. $_" -Level ERROR
             throw
         }
     }
-
     end {
-
         Write-PCXOperationEnd -Status Success
     }
 }

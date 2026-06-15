@@ -3,17 +3,20 @@ function Get-PCXCMPackageCollectionCount {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $Package
+        $Package,
+
+        [Parameter(Mandatory)]
+        $Deployments
     )
 
     try {
 
-        $Deployments = Get-CMDeployment `
-            -SoftwareName $Package.Name `
-            -ErrorAction SilentlyContinue
+        $ResultDeployments = $Deployments | Where-Object {
+            $_.SoftwareName -eq $Package.Name
+        }
 
         return @(
-            $Deployments |
+            $ResultDeployments |
             Select-Object -ExpandProperty CollectionID -Unique
         ).Count
     }

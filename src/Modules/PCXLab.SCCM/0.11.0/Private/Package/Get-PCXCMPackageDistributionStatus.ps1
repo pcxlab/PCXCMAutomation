@@ -3,16 +3,20 @@ function Get-PCXCMPackageDistributionStatus {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $Package
+        $Package,
+
+        [Parameter(Mandatory)]
+        $DistributionStatus
     )
 
     try {
 
-        $Distribution = Get-CMDistributionStatus `
-            -Id $Package.PackageID `
-            -ErrorAction SilentlyContinue
+        $ResultDistribution = $DistributionStatus |
+            Where-Object {
+                $_.PackageID -eq $Package.PackageID
+            }
 
-        if ($Distribution) {
+        if ($ResultDistribution) {
             return 'Distributed'
         }
 
@@ -20,7 +24,10 @@ function Get-PCXCMPackageDistributionStatus {
     }
     catch {
 
-        Write-PCXLog -Message $_.Exception.Message -Level ERROR
+        Write-PCXLog `
+            -Message $_.Exception.Message `
+            -Level ERROR
+
         throw
     }
 }

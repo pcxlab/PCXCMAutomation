@@ -63,7 +63,7 @@ function New-PCXReportObject {
             Requirement      = $Requirement
             Status           = $Status
             Message          = $Message
-            Timestamp        = Get-Date
+            Timestamp        = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
             PackageID        = $null
             CIVersion        = $null
             SourceSite       = $null

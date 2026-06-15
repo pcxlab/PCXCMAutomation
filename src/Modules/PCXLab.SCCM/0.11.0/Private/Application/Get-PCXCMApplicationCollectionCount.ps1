@@ -3,16 +3,19 @@ function Get-PCXCMApplicationCollectionCount {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $Application
+        $Application,
+
+        [Parameter(Mandatory)]
+        $Collections
     )
 
     try {
 
-        $Collections = Get-CMDeviceCollection `
-            -Name "$($Application.LocalizedDisplayName)*" `
-            -ErrorAction SilentlyContinue
+        $ResultCollections = $Collections | Where-Object {
+            $_.Name -like "$($Application.LocalizedDisplayName)*"
+        }
 
-        return @($Collections).Count
+        return @($ResultCollections).Count
     }
     catch {
 

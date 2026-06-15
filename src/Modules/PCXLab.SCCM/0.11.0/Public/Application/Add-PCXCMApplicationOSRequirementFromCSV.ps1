@@ -29,7 +29,7 @@ function Add-PCXCMApplicationOSRequirementFromCSV {
         Write-Verbose "Starting bulk OS requirement processing"
 
         # Import applications
-        $Applications = Import-PCXApplicationList -CsvPath $CsvPath
+        $Applications = Import-PCXCMApplicationList -CsvPath $CsvPath
 
         foreach ($ApplicationName in $Applications) {
             Write-Verbose "Processing application: $ApplicationName"

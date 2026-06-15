@@ -3,21 +3,27 @@ function Get-PCXCMTaskSequenceDeploymentCount {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $TaskSequence
+        $TaskSequence,
+
+        [Parameter(Mandatory)]
+        $TaskSequenceDeployments
     )
 
     try {
 
-        return @(
-            Get-CMTaskSequenceDeployment `
-                -TaskSequenceName $TaskSequence.Name `
-                -Fast `
-                -ErrorAction SilentlyContinue
-        ).Count
+        $ResultDeployments = $TaskSequenceDeployments |
+            Where-Object {
+                $_.PackageID -eq $TaskSequence.PackageID
+            }
+
+        return @($ResultDeployments).Count
     }
     catch {
 
-        Write-PCXLog -Message $_.Exception.Message -Level ERROR
+        Write-PCXLog `
+            -Message $_.Exception.Message `
+            -Level ERROR
+
         throw
     }
 }

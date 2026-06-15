@@ -3,14 +3,19 @@ function Get-PCXCMApplicationCollectionObjects {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        $Application
+        $Application,
+
+        [Parameter(Mandatory)]
+        $Collections
     )
 
     try {
 
-        return @(Get-CMDeviceCollection `
-            -Name "$($Application.LocalizedDisplayName)*" `
-            -ErrorAction SilentlyContinue)
+        return @(
+            $Collections | Where-Object {
+                $_.Name -like "$($Application.LocalizedDisplayName)*"
+            }
+        )
     }
     catch {
 

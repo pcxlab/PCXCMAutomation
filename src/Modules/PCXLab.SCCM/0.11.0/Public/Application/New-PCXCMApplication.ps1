@@ -2,23 +2,23 @@ function New-PCXCMApplication {
 
     [CmdletBinding()]
     param(
-        [parameter(mandatory = $true, Position = 0)]
-        [string]$Name,
+        [Parameter(Mandatory, Position = 0)]
+        [string]$ApplicationName,
 
-        [parameter(mandatory = $true, Position = 1)]
+        [Parameter(Mandatory, Position = 1)]
         [string]$Description,
 
-        [parameter(mandatory = $true, Position = 2)]
+        [Parameter(Mandatory, Position = 2)]
         [string]$Publisher,
 
-        [parameter(mandatory = $true, Position = 3)]
+        [Parameter(Mandatory, Position = 3)]
         [string]$SoftwareVersion,
 
-        [parameter(mandatory = $false, Position = 4)]
-        [string]$Iconlocationfile,
+        [Parameter(Mandatory = $false, Position = 4)]
+        [string]$IconLocationFile,
 
-        [parameter(mandatory = $true, Position = 5)]
-        [string]$ReleaseDate
+        [Parameter(Mandatory, Position = 5)]
+        [datetime]$ReleaseDate
     )
 
     begin {
@@ -27,48 +27,54 @@ function New-PCXCMApplication {
 
     process {
         try {
-            $ExistingApp = Get-CMApplication -Name $Name -Fast -ErrorAction SilentlyContinue
 
-            if ($ExistingApp) {
-                throw "Application already exists: $Name"
+            Ensure-PCXCMConnection
+
+            if (Test-PCXCMApplicationExists -ApplicationName $ApplicationName) {
+                throw "Application already exists: $ApplicationName"
             }
 
-            Write-PCXLog "Creating application: $Name"
+            Write-PCXLog "Creating application: $ApplicationName"
 
             $ApplicationParams = @{
-                Name                 = $Name
+                Name                 = $ApplicationName
                 Description          = $Description
                 Publisher            = $Publisher
                 SoftwareVersion      = $SoftwareVersion
                 OptionalReference    = "Reference"
                 ReleaseDate          = $ReleaseDate
                 AutoInstall          = $true
-                LocalizedName        = $Name
-                UserDocumentation    = "https://mphasis.com/"
-                LinkText             = "Mphasis"
-                LocalizedDescription = $Name
-                Keyword              = $Name
-                PrivacyUrl           = "https://mphasis.com/"
+                LocalizedName        = $ApplicationName
+                UserDocumentation    = "https://pcxlab.com/"
+                LinkText             = "PCXLab"
+                LocalizedDescription = $ApplicationName
+                Keyword              = $ApplicationName
+                PrivacyUrl           = "https://pcxlab.com/"
                 IsFeatured           = $false
                 ErrorAction          = "Stop"
             }
 
-            if ($Iconlocationfile) {
-                $ApplicationParams["IconLocationFile"] = $Iconlocationfile
+            if ($IconLocationFile) {
+                $ApplicationParams["IconLocationFile"] = $IconLocationFile
             }
 
-            $null = New-CMApplication @ApplicationParams
-
-            Write-PCXLog "Application created: $Name"
+            $Application = New-CMApplication @ApplicationParams
+            Write-PCXLog "Application created: $ApplicationName"
+            return $Application
         }
         catch {
-            Write-PCXLog -Message "Failed to create application: $Name. $($_.Exception.Message)" -Level ERROR
+
+            $_ | Format-List * -Force
+
+            Write-PCXLog `
+                -Message $_.Exception.ToString() `
+                -Level ERROR
+
             throw
         }
     }
+
     end {
         Write-PCXOperationEnd
     }
 }
-
-

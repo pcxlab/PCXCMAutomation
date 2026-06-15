@@ -5,7 +5,7 @@ function Create-PCXCMApplication {
         [Parameter(Mandatory)][string]$Path,
         [string]$Language = "EN-US",
         [string]$DPGroup = "All Mangalore Dps",
-        [string]$LimitingCollectionName = "ALL Systems",
+        [string]$LimitingCollectionName = "All Systems",
         [string]$AvailableDateTime = (Get-Date -Format 'yyyy-MM-dd 00:00:00'),
         [string]$DeadlineDateTime = ((Get-Date).AddDays(1).ToString('yyyy-MM-dd 00:00:00'))
     )
@@ -19,60 +19,50 @@ function Create-PCXCMApplication {
             Ensure-PCXCMConnection
         
             # Validate source path and enumerate files
-            $files = Test-PCXPackagePath $Path
-            $installer = Get-PCXInstaller $files
-            $meta = Get-PCXMetadataFromPath $Path
+            $Files = Test-PCXPackagePath $Path
+            $Installer = Get-PCXCMPackageInstaller $Files
+            $Meta = Get-PCXMetadataFromPath $Path
 
-            $ApplicationName = "APP $($meta.Name)"
-            $Collections = Get-PCXCollectionNames -PackageName $ApplicationName
+            $ApplicationName = "APP $($Meta.Name)"
+            $Collections = New-PCXCMDeploymentCollectionNames -ObjectName $ApplicationName
         
             Write-PCXLog "Application: $ApplicationName"
-            Write-PCXLog "Publisher  : $($meta.Company)"
-            Write-PCXLog "Version    : $($meta.Version)"
-            Write-PCXLog "Installer  : $($installer.Name)"
+            Write-PCXLog "Publisher  : $($Meta.Company)"
+            Write-PCXLog "Version    : $($Meta.Version)"
+            Write-PCXLog "Installer  : $($Installer.Name)"
 
-            # Step 1 - Collections
-            New-PCXCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
-
-            # Step 2 - Icon Detection
-            $IconFile = $files | Where-Object { $_.Extension -match '\.(png|ico|jpg|jpeg)$' } | Select-Object -First 1
+            # Icon Detection
+            $IconFile = $Files | Where-Object { $_.Extension -match '\.(png|ico|jpg|jpeg)$' } | Select-Object -First 1
 
             if (-not $IconFile) {
                 Write-PCXLog -Message "No icon file found. Proceeding without icon." -Level WARNING
             }
 
-            # Step 3 - Create Application
-            New-PCXCMApplication `
-                -Name $ApplicationName `
-                -Description "New Application" `
-                -Publisher $meta.Company `
-                -SoftwareVersion $meta.Version `
-                -ReleaseDate (Get-Date) `
-                -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
+            # Step 1 - Create Application
+            $Application = New-PCXCMApplication -ApplicationName $ApplicationName -Description $ApplicationName -Publisher $Meta.Company -SoftwareVersion $Meta.Version -ReleaseDate (Get-Date) -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
 
-            # Step 4 - Create Deployment Type
-            $null = New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $installer.FullName
+            # Step 2 - Add Deployment Type
+            New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $Installer.FullName
 
-            # Step 5 - Requirements
+            # Step 3 - Add Requirements to the Deployment Type
             $OSValidateSetPath = Join-Path $PSScriptRoot "..\..\Config\OSValidateSet.csv"
             if (Test-Path $OSValidateSetPath) {
-                $null = Add-PCXCMApplicationOSRequirement `
-                    -ApplicationName $ApplicationName `
-                    -Requirement "All Windows 11 (64-bit)" `
-                    -OSValidateSetPath $OSValidateSetPath `
-                    -AllowRequirementCreation
+                Add-PCXCMApplicationOSRequirement -ApplicationName $ApplicationName -Requirement "All Windows 11 (64-bit)" -OSValidateSetPath $OSValidateSetPath -AllowRequirementCreation
             }
             else {
                 Write-PCXLog "OS validation set not found. Skipping OS requirement." -Level WARNING
             }
 
-            $null = Add-PCXDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
-            $null = Add-PCXMemoryRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumMemoryMB 4096
+            Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
+            Add-PCXCMApplicationMemoryRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumMemoryMB 4096
 
-            # Step 6 - Content Distribution
-            $null = Start-PCXCMContentDistribution -ApplicationName $ApplicationName -DistributionPointGroupName $DPGroup
+            # Step 4 - Content Distribution
+            Start-PCXCMContentDistribution -ApplicationName $ApplicationName -DistributionPointGroupName $DPGroup
 
-            # Step 7 - Deployments
+            # Step 5 - Collections
+            New-PCXCMDeploymentDeviceCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
+
+            # Step 6 - Deployments
             $DeploymentParams = @{
                 Name              = $ApplicationName
                 AvailableDateTime = $AvailableDateTime
@@ -83,10 +73,14 @@ function Create-PCXCMApplication {
             New-PCXCMApplicationDeployment @DeploymentParams -CollectionName $Collections.Install -Action Install -Purpose Required
             New-PCXCMApplicationDeployment @DeploymentParams -CollectionName $Collections.Uninstall -Action Uninstall -Purpose Required
 
-            # Step 8 - Finalize
-            Set-PCXCollectionRules -Collections $Collections
-            $null = Move-PCXCMCollectionsToFolder -Collections $Collections -meta $meta -ObjectName $ApplicationName
-            $null = Move-PCXCMApplicationToFolder -meta $meta
+            # Step 7 - Add Collection Rules
+            Set-PCXCMDeploymentCollectionRules -Collections $Collections
+
+            # Step 8 - Collection Movement to folders
+            Move-PCXCMCollectionsToFolder -Collections $Collections -meta $Meta -ObjectName $ApplicationName
+            
+            # Step 9 - Application Movement to folders
+            Move-PCXCMApplicationToFolder -meta $Meta
 
             Write-PCXLog "SUCCESS: $ApplicationName"
         }

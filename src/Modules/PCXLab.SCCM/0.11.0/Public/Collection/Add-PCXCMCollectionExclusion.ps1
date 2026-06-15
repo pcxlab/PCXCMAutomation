@@ -18,12 +18,15 @@ function Add-PCXCMCollectionExclusion {
 
         try {
 
-            $TargetCollection = Get-CMDeviceCollection `
-                -Name $SelectCollectionName `
-                -ErrorAction SilentlyContinue
+            $CollectionLookup = @{}
+
+            Get-PCXCMCachedCollection | ForEach-Object {
+                $CollectionLookup[$_.Name] = $_
+            }
+
+            $TargetCollection = $CollectionLookup[$SelectCollectionName]
 
             if (-not $TargetCollection) {
-
                 throw "Collection not found: $SelectCollectionName"
             }
 
@@ -31,9 +34,7 @@ function Add-PCXCMCollectionExclusion {
 
                 try {
 
-                    $ExcludeCollection = Get-CMDeviceCollection `
-                        -Name $ExcludeCollectionName `
-                        -ErrorAction SilentlyContinue
+                    $ExcludeCollection = $CollectionLookup[$ExcludeCollectionName]
 
                     if ($ExcludeCollection) {
 

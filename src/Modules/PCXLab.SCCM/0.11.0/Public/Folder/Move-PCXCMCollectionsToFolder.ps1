@@ -7,7 +7,7 @@ function Move-PCXCMCollectionsToFolder {
         [pscustomobject]$Collections,
 
         [Parameter(Mandatory)]
-        [pscustomobject]$meta,
+        [pscustomobject]$Meta,
 
         [Parameter(Mandatory)]
         [string]$ObjectName
@@ -17,43 +17,54 @@ function Move-PCXCMCollectionsToFolder {
 
         Write-PCXOperationStart
     }
+
     process {
+
         try {
 
-            $folder = "\DeviceCollection\Mphasis Application Deployment\$($meta.Company)\$($meta.Product)\$ObjectName"
+            $Folder = "\DeviceCollection\PCXLab Application Deployment\$($Meta.Company)\$($Meta.Product)\$ObjectName"
 
-            $null = New-PCXCMFolder -Path $folder
+            $null = New-PCXCMFolder -Path $Folder
 
-            $collectionNames = @(
+            $CollectionNames = @(
                 $Collections.Available,
                 $Collections.Install,
                 $Collections.Uninstall,
                 $Collections.Exception
             ) | Where-Object { $_ }
 
-            foreach ($name in $collectionNames) {
+            foreach ($CollectionName in $CollectionNames) {
 
-                $collectionObject = Get-CMDeviceCollection -Name $name
-                
-                if ($collectionObject) {
-                    Move-PCXCMObject -InputObject $collectionObject -FolderPath $folder
-                    Write-PCXLog "Moved Collection: $name"
+                $CollectionObject = Get-CMDeviceCollection -Name $CollectionName -ErrorAction SilentlyContinue
+
+                if ($CollectionObject) {
+
+                    Move-PCXCMObject `
+                        -InputObject $CollectionObject `
+                        -FolderPath $Folder
+
+                    Write-PCXLog "Moved Collection: $CollectionName"
+                }
+                else {
+
+                    Write-PCXLog `
+                        -Message "Collection not found: $CollectionName" `
+                        -Level WARNING
                 }
             }
         }
         catch {
-            Write-PCXLog -Message "Failed to move collections: $ObjectName. $($_.Exception.Message)" -Level ERROR
+
+            Write-PCXLog `
+                -Message "Failed to move collections: $ObjectName. $($_.Exception.Message)" `
+                -Level ERROR
 
             throw
         }
-        
     }
+
     end {
 
         Write-PCXOperationEnd -Status Success
     }
 }
-
-
-
-

@@ -17,58 +17,59 @@ function Create-PCXCMPackage {
         $OriginalLocation = Get-Location
         try {
 
-            $files = Test-PCXPackagePath $Path
+            $Files = Test-PCXPackagePath $Path
             $FileMap = @{}
-            foreach ($file in $files) {
-                $FileMap[$file.Name.ToLower()] = $file
+            foreach ($File in $Files) {
+                $FileMap[$File.Name.ToLower()] = $File
             }
 
-            $installer = Get-PCXInstaller $files
+            $Installer = Get-PCXCMPackageInstaller $Files
 
-            $meta = Get-PCXMetadataFromPath $Path
-            $PackageName = "PKG $($meta.Name)"
+            $Meta = Get-PCXMetadataFromPath $Path
+            $PackageName = "PKG $($Meta.Name)"
 
-            $programs = Get-PCXProgramNames -PackageName $PackageName
-            $Collections = Get-PCXCollectionNames -PackageName $PackageName
+            $Programs = New-PCXCMPackageProgramNames -PackageName $PackageName
+            $Collections = New-PCXCMDeploymentCollectionNames -ObjectName $PackageName
 
             Write-PCXLog "Package: $PackageName"
-            Write-PCXLog "Installer: $($installer.Name)"
+            Write-PCXLog "Installer: $($Installer.Name)"
 
             Ensure-PCXCMConnection
 
-            $platforms = Get-CMSupportedPlatform -Fast | Where-Object { $_.DisplayText -like "*Windows 11*" }
+            $Platforms = Get-CMSupportedPlatform -Fast | Where-Object { $_.DisplayText -like "*Windows 11*" }
 
-            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            #New-PCXCMPackage -PackageName $PackageName -Company $Meta.Company -Version $Meta.Version -Language $Language -Path $Path
+            $Package = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
 
-            $InstallCommand = Get-PCXCommandLineForPackage -Type "Install" -Installer $installer -FileMap $FileMap
-            $UninstallCommand = Get-PCXCommandLineForPackage -Type "Uninstall" -Installer $installer -FileMap $FileMap
-            $OSDCommand = Get-PCXCommandLineForPackage -Type "OSD" -Installer $installer -FileMap $FileMap
+            Start-PCXCMContentDistribution -PackageName $PackageName -DistributionPointGroupName $DPGroup
 
-            Add-PCXProgram -PackageName $PackageName -Type "Install" -CommandLine $InstallCommand -Platforms $platforms
-            Add-PCXProgram -PackageName $PackageName -Type "Available" -CommandLine $InstallCommand -Platforms $platforms
-            Add-PCXProgram -PackageName $PackageName -Type "Uninstall" -CommandLine $UninstallCommand -Platforms $platforms
+            $InstallCommand = Get-PCXCMCommandLineForPackage -Type "Install" -Installer $Installer -FileMap $FileMap
+            $UninstallCommand = Get-PCXCMCommandLineForPackage -Type "Uninstall" -Installer $Installer -FileMap $FileMap
+            $OSDCommand = Get-PCXCMCommandLineForPackage -Type "OSD" -Installer $Installer -FileMap $FileMap
 
-            if (Test-PCXHasUpgrade -FileMap $FileMap) {
+            Add-PCXCMPackageProgram -PackageName $PackageName -Type "Install" -CommandLine $InstallCommand -Platforms $Platforms
+            Add-PCXCMPackageProgram -PackageName $PackageName -Type "Available" -CommandLine $InstallCommand -Platforms $Platforms
+            Add-PCXCMPackageProgram -PackageName $PackageName -Type "Uninstall" -CommandLine $UninstallCommand -Platforms $Platforms
 
-                $UpgradeCommand = Get-PCXCommandLineForPackage -Type "Upgrade" -Installer $installer -FileMap $FileMap
+            if (Test-PCXCMUpgradeSupported -FileMap $FileMap) {
 
-                if ($UpgradeCommand) {
-                    Add-PCXProgram -PackageName $PackageName -Type "Upgrade" -CommandLine $UpgradeCommand -Platforms $platforms
+                $UpgradeCommand = Get-PCXCMCommandLineForPackage -Type "Upgrade" -Installer $Installer -FileMap $FileMap
+
+                if ($UpgradeCommand) {  
+                    Add-PCXCMPackageProgram -PackageName $PackageName -Type "Upgrade" -CommandLine $UpgradeCommand -Platforms $Platforms
                 }
             }
 
-            Add-PCXProgram -PackageName $PackageName -Type "OSD" -CommandLine $OSDCommand -Platforms $platforms
+            Add-PCXCMPackageProgram -PackageName $PackageName -Type "OSD" -CommandLine $OSDCommand -Platforms $Platforms
 
-            $null = Start-PCXCMContentDistribution -PackageName $PackageName -DistributionPointGroupName $DPGroup
-
-            New-PCXCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
+            New-PCXCMDeploymentDeviceCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
             $DeadlineTime = (Get-Date -Hour 10 -Minute 0 -Second 0).AddDays(7)
-            New-PCXCMPackageDeployments -PackageName $PackageName -Programs $programs -Collections $Collections -DeadlineTime $DeadlineTime
+            New-PCXCMPackageDeployments -PackageName $PackageName -Programs $Programs -Collections $Collections -DeadlineTime $DeadlineTime
 
-            Set-PCXCollectionRules -Collections $Collections
+            Set-PCXCMDeploymentCollectionRules -Collections $Collections
  
-            $null = Move-PCXCMCollectionsToFolder -Collections $Collections -Meta $meta -ObjectName $PackageName
-            $null = Move-PCXCMPackageToFolder -Meta $meta
+            Move-PCXCMCollectionsToFolder -Collections $Collections -Meta $Meta -ObjectName $PackageName
+            Move-PCXCMPackageToFolder -Meta $Meta
 
             Write-PCXLog "SUCCESS: $PackageName"
         }

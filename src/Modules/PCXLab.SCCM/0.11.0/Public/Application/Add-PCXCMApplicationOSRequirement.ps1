@@ -29,7 +29,7 @@ function Add-PCXCMApplicationOSRequirement {
             $Application = Get-PCXCMApplication -ApplicationName $ApplicationName
 
             # Deserialize XML
-            $XML = Get-PCXApplicationXML -Application $Application
+            $XML = Get-PCXCMApplicationXML -Application $Application
 
             # Detect existing OS requirement
             $ExistingOSRequirement = $false
@@ -53,14 +53,14 @@ function Add-PCXCMApplicationOSRequirement {
                     return (Save-PCXOSRequirementReport -ReportPath $ReportPath -ApplicationName $ApplicationName -Requirement $Requirement -Status "Skipped" -Application $Application)
                 }
 
-                $Operand = Get-PCXOSRequirementOperand -Requirement $Requirement -CsvPath $OSValidateSetPath
+                $Operand = Get-PCXCMApplicationOSRequirementOperand -Requirement $Requirement -CsvPath $OSValidateSetPath
                 if (-not $Operand) {
                     throw "Requirement not found in OS validation set: $Requirement"
                 }
 
-                $RequirementRule = New-PCXOSRequirementRule -Operand $Operand
+                $RequirementRule = New-PCXCMApplicationOSRequirementRule -Operand $Operand
 
-                Add-PCXOSRequirementToDeploymentType `
+                Add-PCXCMApplicationOSRequirementToDeploymentType `
                     -ApplicationName $ApplicationName `
                     -RequirementRule $RequirementRule
 
@@ -72,7 +72,7 @@ function Add-PCXCMApplicationOSRequirement {
             # EXISTING REQUIREMENT DETECTION
             # ==========================================================
 
-            if (Test-PCXOSRequirementExists -Xml $XML -Requirement $Requirement) {
+            if (Test-PCXCMApplicationOSRequirementExists -Xml $XML -Requirement $Requirement) {
                 Write-PCXLog "OS requirement '$Requirement' already exists for '$ApplicationName'."
                 return (Save-PCXOSRequirementReport -ReportPath $ReportPath -ApplicationName $ApplicationName -Requirement $Requirement -Status "AlreadyExists" -Application $Application)
             }
@@ -81,12 +81,12 @@ function Add-PCXCMApplicationOSRequirement {
             # XML MERGE PATH
             # ==========================================================
 
-            $Operand = Get-PCXOSRequirementOperand -Requirement $Requirement -CsvPath $OSValidateSetPath
+            $Operand = Get-PCXCMApplicationOSRequirementOperand -Requirement $Requirement -CsvPath $OSValidateSetPath
             if (-not $Operand) {
                 throw "Requirement not found in OS validation set: $Requirement"
             }
 
-            $Updated = Add-PCXOSRequirementToXML `
+            $Updated = Add-PCXCMApplicationOSRequirementToXML `
                 -Xml $XML `
                 -Requirement $Requirement `
                 -Operand $Operand
@@ -96,7 +96,7 @@ function Add-PCXCMApplicationOSRequirement {
                 return (Save-PCXOSRequirementReport -ReportPath $ReportPath -ApplicationName $ApplicationName -Requirement $Requirement -Status "Skipped" -Application $Application)
             }
 
-            Save-PCXApplicationXML -Application $Application -Xml $XML
+            Save-PCXCMApplicationXML -Application $Application -Xml $XML
 
             Write-PCXLog "OS requirement '$Requirement' merged into XML for '$ApplicationName'"
             return (Save-PCXOSRequirementReport -ReportPath $ReportPath -ApplicationName $ApplicationName -Requirement $Requirement -Status "Updated" -Application $Application)

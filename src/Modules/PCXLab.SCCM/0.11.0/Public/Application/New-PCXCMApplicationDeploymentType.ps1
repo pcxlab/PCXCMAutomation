@@ -27,7 +27,7 @@ function New-PCXCMApplicationDeploymentType {
             Write-PCXLog "Creating deployment type for: $Name"
             Write-PCXLog "Installer: $fileName ($extension)"
 
-            $detectionClause = New-PCXDetectionClause -Installer $installerObject
+            $detectionClause = New-PCXCMApplicationDetectionClause -Installer $installerObject
 
             $CommonParams = @{
                 ApplicationName    = $Name

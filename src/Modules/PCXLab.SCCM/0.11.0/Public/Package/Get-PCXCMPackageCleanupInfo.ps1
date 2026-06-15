@@ -17,13 +17,13 @@ function Get-PCXCMPackageCleanupInfo {
 
             Ensure-PCXCMConnection
 
-            # Resolve Package
+            $AllPackages = Get-PCXCMCachedPackage
+
             if ($PSCmdlet.ParameterSetName -eq 'PackageName') {
-                $Package = Get-CMPackage -Name $PackageName -Fast -ErrorAction SilentlyContinue
+                $Package = $AllPackages | Where-Object { $_.Name -eq $PackageName } | Select-Object -First 1
             }
             else {
-                # Attempt to find by path - still requires full list if provider doesn't support filter
-                $Package = Get-CMPackage -Fast | Where-Object { $_.PkgSourcePath -eq $PackagePath }
+                $Package = $AllPackages | Where-Object { $_.PkgSourcePath -eq $PackagePath } | Select-Object -First 1
             }
 
             if (-not $Package) {
@@ -38,7 +38,10 @@ function Get-PCXCMPackageCleanupInfo {
             Write-PCXLog -Message "Resolved Package: $($Package.Name) [$($Package.PackageID)]"
 
             # Collections - use -Fast for performance # Fast will not work
-            $Collections = Get-CMDeviceCollection -Name "$($Package.Name)*" |
+            $Collections = Get-PCXCMCachedCollection |
+            Where-Object {
+                $_.Name -like "$($Package.Name)*"
+            } |
             Sort-Object {
                 switch -Regex ($_.Name) {
                     '\[INSTALL\]'   { 1; break }
@@ -52,13 +55,7 @@ function Get-PCXCMPackageCleanupInfo {
             Write-PCXLog -Message "Found $(@($Collections).Count) Collection(s)"
 
             # Collection Folder - use -Fast
-            $CollectionFolder = Get-CMFolder -Name $Package.Name |
-            Where-Object { $_.ObjectTypeName -eq 'SMS_Collection_Device' }
-
-            if (@($CollectionFolder).Count -gt 1) {
-                Write-PCXLog -Message "Multiple collection folders found. Using first match." -Level WARNING
-                $CollectionFolder = $CollectionFolder | Select-Object -First 1
-            }
+            $CollectionFolder = Get-PCXCMCollectionFolder -Name $Package.Name
 
             if ($CollectionFolder) {
                 Write-PCXLog -Message "Found Collection Folder: $($CollectionFolder.Name)"

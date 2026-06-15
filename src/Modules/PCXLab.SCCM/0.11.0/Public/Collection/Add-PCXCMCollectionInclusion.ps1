@@ -15,26 +15,22 @@ function Add-PCXCMCollectionInclusion {
     }
 
     process {
-
         try {
+            $CollectionLookup = @{}
 
-            $TargetCollection = Get-CMDeviceCollection `
-                -Name $SelectCollectionName `
-                -ErrorAction SilentlyContinue
+            Get-PCXCMCachedCollection | ForEach-Object {
+                $CollectionLookup[$_.Name] = $_
+            }
+
+            $TargetCollection = $CollectionLookup[$SelectCollectionName]
 
             if (-not $TargetCollection) {
-
                 throw "Collection not found: $SelectCollectionName"
             }
 
             foreach ($IncludeCollectionName in $IncludeCollectionNames) {
-
-                $IncludeCollection = Get-CMDeviceCollection `
-                    -Name $IncludeCollectionName `
-                    -ErrorAction SilentlyContinue
-
+                $IncludeCollection = $CollectionLookup[$IncludeCollectionName]
                 if (-not $IncludeCollection) {
-
                     Write-PCXLog "Include collection not found: $IncludeCollectionName"
                     continue
                 }
@@ -49,12 +45,10 @@ function Add-PCXCMCollectionInclusion {
             }
         }
         catch {
-Write-PCXLog -Message "Failed to add inclusion collections to '$SelectCollectionName'. $_" -Level ERROR
-
+            Write-PCXLog -Message "Failed to add inclusion collections to '$SelectCollectionName'. $_" -Level ERROR
             throw
         }
     }
-
     end {
 
         Write-PCXOperationEnd -Status Success
