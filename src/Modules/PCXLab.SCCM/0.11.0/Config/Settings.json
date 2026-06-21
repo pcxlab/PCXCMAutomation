@@ -2,7 +2,7 @@
     "DefaultLimitingCollection": "All Systems",
     "_DefaultLimitingCollectionExample": "PCXLAB - TEST LIMITING COLLECTION [PREVIEW]",
 
-    "EnableFallbackData": false,
+    "EnableFallbackData": true,
 
     "FallbackDistributionPointGroups": [
         "PCXLAB Fallback DP Group - TEST"

@@ -34,6 +34,10 @@
             Write-PCXLog "Publisher  : $($Meta.Company)"
             Write-PCXLog "Version    : $($Meta.Version)"
             Write-PCXLog "Installer  : $($Installer.Name)"
+            
+            Write-PCXLog "Ticket Reference Number is : $ReferenceNumber"
+            Write-PCXLog "Reviewer Name is : $ReviewerName"
+            Write-PCXLog "Comments is : $Comments"
 
             # Icon Detection
             $IconFile = $Files | Where-Object { $_.Extension -match '\.(png|ico|jpg|jpeg)$' } | Select-Object -First 1

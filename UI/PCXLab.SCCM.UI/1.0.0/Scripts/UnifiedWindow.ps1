@@ -185,6 +185,7 @@ function Show-PCXCMConfirmDialog {
         [string]$Version,
         [string[]]$Groups,
         [string[]]$DPs,
+        [string[]]$CMGs,
         [string]$RefNumber,
         [string]$Reviewer,
         [string]$Comments
@@ -204,6 +205,7 @@ function Show-PCXCMConfirmDialog {
     $cTxtVersion   = $cWindow.FindName("txtConfVersion")
     $cTxtGroups    = $cWindow.FindName("txtConfGroups")
     $cTxtDPs       = $cWindow.FindName("txtConfDPs")
+    $cTxtCMGs      = $cWindow.FindName("txtConfCMGs")
     $cTxtRef       = $cWindow.FindName("txtConfRef")
     $cTxtReviewer  = $cWindow.FindName("txtConfReviewer")
     $cTxtComments  = $cWindow.FindName("txtConfComments")
@@ -219,6 +221,7 @@ function Show-PCXCMConfirmDialog {
     $cTxtVersion.Text  = $Version
     $cTxtGroups.Text   = $(if ($Groups.Count -gt 0) { $Groups -join ", " } else { "None" })
     $cTxtDPs.Text      = $(if ($DPs.Count -gt 0) { $DPs -join ", " } else { "None" })
+    $cTxtCMGs.Text     = $(if ($CMGs.Count -gt 0) { $CMGs -join ", " } else { "None" })
     $cTxtRef.Text      = $RefNumber
     $cTxtReviewer.Text = $Reviewer
     $cTxtComments.Text = $Comments
@@ -330,8 +333,8 @@ $btnCreate.Add_Click({
 
     # Merge DPs and CMGs into a single DistributionPoints array
     $DistributionPoints = @(
-        $SelectedDPs
         $SelectedCMGs
+        $SelectedDPs
     ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 
     # Require at least one target
@@ -360,7 +363,8 @@ $btnCreate.Add_Click({
         -Product $txtProduct.Text `
         -Version $txtVersion.Text `
         -Groups $SelectedGroups `
-        -DPs $DistributionPoints `
+        -DPs $SelectedDPs `
+        -CMGs $SelectedCMGs `
         -RefNumber $txtRefNumber.Text `
         -Reviewer $txtReviewer.Text `
         -Comments $txtComments.Text
