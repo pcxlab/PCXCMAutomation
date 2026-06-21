@@ -12,50 +12,23 @@ function Save-PCXCMCache {
     )
 
     try {
-
-        $CacheRoot = 'C:\ProgramData\PCXLab\SCCMCache'
-
-        if (-not (Test-Path $CacheRoot)) {
-
-            New-Item `
-                -Path $CacheRoot `
-                -ItemType Directory `
-                -Force | Out-Null
-        }
-
-        $CacheFile = Join-Path `
-            $CacheRoot `
-            "$Name.clixml"
-
-        $MetadataFile = Join-Path `
-            $CacheRoot `
-            "$Name.metadata.json"
-
-        Export-Clixml `
-            -Path $CacheFile `
-            -InputObject $Data `
-            -Force
+        $CacheRoot = Initialize-PCXCMCacheFolder
+        $CacheFile = Join-Path $CacheRoot "$Name.clixml"
+        $MetadataFile = Join-Path $CacheRoot "$Name.metadata.json"
+        Export-Clixml -Path $CacheFile -InputObject $Data -Force
 
         $Metadata = [PSCustomObject]@{
             Name         = $Name
             Created      = (Get-Date).ToString('o')
-            ItemCount    = @($Data).Count
+            ItemCount    = if ($null -eq $Data) { 0 } else { $Data.Count };
             ExpiresHours = $ExpiresHours
         }
 
-        $Metadata |
-            ConvertTo-Json |
-            Set-Content $MetadataFile
-
-        Write-PCXLog `
-            -Message "Saved cache: $Name ($(@($Data).Count) items)"
+        $Metadata | ConvertTo-Json | Set-Content $MetadataFile
+        Write-PCXLog -Message "Saved cache: $Name ($(@($Data).Count) items)"
     }
     catch {
-
-        Write-PCXLog `
-            -Message $_.Exception.Message `
-            -Level ERROR
-
+        Write-PCXLog -Message $_.Exception.Message -Level ERROR
         throw
     }
 }

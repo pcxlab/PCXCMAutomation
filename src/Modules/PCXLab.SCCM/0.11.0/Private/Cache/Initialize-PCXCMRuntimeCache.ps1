@@ -10,6 +10,9 @@ function Initialize-PCXCMRuntimeCache {
             DistributionStatus      = $null
             TaskSequences           = $null
             TaskSequenceDeployments = $null
+            DistributionPoints      = $null
+            DistributionPointGroups = $null
+            CloudManagementGateways = $null
         }
     }
 }

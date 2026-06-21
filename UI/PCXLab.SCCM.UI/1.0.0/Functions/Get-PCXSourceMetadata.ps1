@@ -13,7 +13,7 @@ function Get-PCXSourceMetadata {
     $raw = $parts[-1]
 
     $versionMatch = [regex]::Match($raw, '\d+(\.\d+)+')
-    $version = if ($versionMatch.Success) { $versionMatch.Value } else { "1.0" }
+    $version = $(if ($versionMatch.Success) { $versionMatch.Value } else { "1.0" })
 
     $product = $raw -replace [regex]::Escape($version), ""
     $product = $product -replace '[\.\-_]', ' '

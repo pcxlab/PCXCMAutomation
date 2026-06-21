@@ -1,12 +1,11 @@
-function New-PCXCMDeviceCollection {
+﻿function New-PCXCMDeviceCollection {
 
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [string]$CollectionName,
 
         [Parameter(Mandatory = $false, Position = 1)]
-        #[string]$LimitingCollection = "All Systems"
-        [string]$LimitingCollection = "All Windows Workstation or Professional Systems"
+        [string]$LimitingCollection = (Get-PCXCMDefaultLimitingCollection)
     )
 
     begin {
@@ -37,7 +36,7 @@ MS-Document :
 https://learn.microsoft.com/en-us/powershell/module/configurationmanager/new-cmdevicecollection?view=sccm-ps
 
 Direct Command :
-New-CMDeviceCollection -Name "PKG_7zip_2.0.0_01[Install]" -LimitingCollectionName "All Systems"
+New-CMDeviceCollection -Name "PKG_7zip_2.0.0_01[Install]" -LimitingCollectionName "<YOUR_LIMITING_COLLECTION>"
 
 Usage example :
 New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[Install]"
@@ -45,6 +44,7 @@ New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[Available]"
 New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[UnInstall]"
 New-PCXCMDeviceCollection -CollectionName "PKG_7zip_2.0.0_01[Exception]"
 #>
+
 
 
 

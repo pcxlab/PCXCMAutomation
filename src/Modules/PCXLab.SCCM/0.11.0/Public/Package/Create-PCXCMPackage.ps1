@@ -1,12 +1,17 @@
-function Create-PCXCMPackage {
+﻿function Create-PCXCMPackage {
 
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [string]$Path,
+
         [string]$Language = "EN-US",
-        [string]$DPGroup = "All Mangalore Dps",
-        [string]$LimitingCollectionName = "ALL Systems"
+        [string[]]$DistributionPointGroups, # Array Difined
+        [string[]]$DistributionPoints, # Array Difined
+        [string]$LimitingCollectionName = (Get-PCXCMDefaultLimitingCollection),
+        [string]$ReferenceNumber,
+        [string]$ReviewerName,
+        [string]$Comments
     )
 
     begin {
@@ -38,10 +43,13 @@ function Create-PCXCMPackage {
 
             $Platforms = Get-CMSupportedPlatform -Fast | Where-Object { $_.DisplayText -like "*Windows 11*" }
 
-            #New-PCXCMPackage -PackageName $PackageName -Company $Meta.Company -Version $Meta.Version -Language $Language -Path $Path
-            $Package = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            #$Package = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
 
-            Start-PCXCMContentDistribution -PackageName $PackageName -DistributionPointGroupName $DPGroup
+            $null = Start-PCXCMContentDistribution `
+                -PackageName $PackageName `
+                -DistributionPointGroups $DistributionPointGroups `
+                -DistributionPoints $DistributionPoints
 
             $InstallCommand = Get-PCXCMCommandLineForPackage -Type "Install" -Installer $Installer -FileMap $FileMap
             $UninstallCommand = Get-PCXCMCommandLineForPackage -Type "Uninstall" -Installer $Installer -FileMap $FileMap
@@ -66,10 +74,10 @@ function Create-PCXCMPackage {
             $DeadlineTime = (Get-Date -Hour 10 -Minute 0 -Second 0).AddDays(7)
             New-PCXCMPackageDeployments -PackageName $PackageName -Programs $Programs -Collections $Collections -DeadlineTime $DeadlineTime
 
-            Set-PCXCMDeploymentCollectionRules -Collections $Collections
+            $null = Set-PCXCMDeploymentCollectionRules -Collections $Collections
  
-            Move-PCXCMCollectionsToFolder -Collections $Collections -Meta $Meta -ObjectName $PackageName
-            Move-PCXCMPackageToFolder -Meta $Meta
+            $null = Move-PCXCMCollectionsToFolder -Collections $Collections -Meta $Meta -ObjectName $PackageName
+            $null = Move-PCXCMPackageToFolder -Meta $Meta
 
             Write-PCXLog "SUCCESS: $PackageName"
         }
@@ -92,4 +100,5 @@ function Create-PCXCMPackage {
 }
 
 #Create-PCXCMPackage -Path "\\192.168.25.214\Package_Source\Applications\Igor Pavlov\7zip\7zip 26.0.2"
+
 

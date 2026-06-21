@@ -2,7 +2,7 @@ function Write-PCXOperationEnd {
 
     [CmdletBinding()]
     param(
-        [ValidateSet("Success", "Failed")]
+        [ValidateSet("Success", "Failed", "Warning")]
         [string]$Status = "Success",
 
         [Parameter(Mandatory = $false)]
@@ -17,22 +17,10 @@ function Write-PCXOperationEnd {
 
         $Operation.Stopwatch.Stop()
 
-        $Duration = [math]::Round(
-            $Operation.Stopwatch.Elapsed.TotalSeconds,
-            2
-        )
-
-        if ($Duration -lt 60) {
-            $DurationText = "{0:N2} sec" -f $Duration
-        }
-        else {
-            $Minutes = [math]::Floor($Duration / 60)
-            $Seconds = $Duration % 60
-            $DurationText = "{0} min {1:N2} sec" -f $Minutes, $Seconds
-        }
+        $DurationText = Format-PCXDuration `
+            -TotalSeconds $Operation.Stopwatch.Elapsed.TotalSeconds
 
         $StatusText = "COMPLETED ($($Status.ToUpper()))"
-        #$FinalMessage = if ($Message) { "$StatusText - $Message ($DurationText)" } else { "$StatusText ($DurationText)" }
 
         $FinalMessage = if ($Message) {
             "$StatusText - $Message ($DurationText) - $($Global:PCXLogConfiguration.Website)"
@@ -41,12 +29,16 @@ function Write-PCXOperationEnd {
             "$StatusText ($DurationText) - $($Global:PCXLogConfiguration.Website)"
         }
 
-        $LogLevel = if ($Status -eq "Success") { "INFO" } else { "ERROR" }
+        #$LogLevel = if ($Status -eq "Success") { "INFO" } else { "ERROR" }
+        switch ($Status) {
+            'Success' { $LogLevel = 'INFO' }
+            'Warning' { $LogLevel = 'WARNING' }
+            'Failed' { $LogLevel = 'ERROR' }
+        }
 
         Write-PCXLog -Message $FinalMessage -Level $LogLevel
     }
     else {
-        # Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation stack sync issue." -Level WARNING
         Write-PCXLog "COMPLETED ($($Status.ToUpper())) - Unknown Operation stack sync issue. - $($Global:PCXLogConfiguration.Website)" -Level WARNING
     }
 }

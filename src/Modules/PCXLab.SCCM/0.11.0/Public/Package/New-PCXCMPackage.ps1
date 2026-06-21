@@ -28,7 +28,6 @@ function New-PCXCMPackage {
                 throw "Package already exists: $PackageName"
             }
             Write-PCXLog "Creating package: $PackageName"
-            #New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
             $Package = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
             Write-PCXLog "Package created: $PackageName"
             return $Package

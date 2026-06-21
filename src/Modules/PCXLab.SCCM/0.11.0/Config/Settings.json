@@ -1,4 +1,18 @@
 ﻿{
-  "SiteCode": "P01",
-  "ProviderMachine": "SCCM01"
+    "DefaultLimitingCollection": "All Systems",
+    "_DefaultLimitingCollectionExample": "PCXLAB - TEST LIMITING COLLECTION [PREVIEW]",
+
+    "EnableFallbackData": false,
+
+    "FallbackDistributionPointGroups": [
+        "PCXLAB Fallback DP Group - TEST"
+    ],
+
+    "FallbackDistributionPoints": [
+        "PCXLAB Fallback DP - TEST"
+    ],
+
+    "FallbackCloudManagementGateways": [
+        "PCXLAB Fallback CMG - TEST"
+    ]
 }

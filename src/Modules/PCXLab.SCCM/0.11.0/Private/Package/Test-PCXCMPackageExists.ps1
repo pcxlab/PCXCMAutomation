@@ -7,7 +7,6 @@ function Test-PCXCMPackageExists {
     )
 
     try {
-        #return $null -ne (Get-CMPackage -Name $PackageName -ErrorAction SilentlyContinue)
         return $null -ne (Get-CMPackage -Name $PackageName -Fast -ErrorAction SilentlyContinue)
     }
     catch {

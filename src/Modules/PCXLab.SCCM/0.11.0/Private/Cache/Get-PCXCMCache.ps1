@@ -8,17 +8,13 @@ function Get-PCXCMCache {
 
     $CacheRoot = 'C:\ProgramData\PCXLab\SCCMCache'
 
-    $CacheFile = Join-Path `
-        $CacheRoot `
-        "$Name.clixml"
+    $CacheFile = Join-Path $CacheRoot "$Name.clixml"
 
     if (-not (Test-Path $CacheFile)) {
         return $null
     }
 
-    Write-PCXLog `
-        -Message "Loaded cache: $Name"
+    Write-PCXLog -Message "Loaded cache: $Name"
 
-    return Import-Clixml `
-        -Path $CacheFile
+    return Import-Clixml -Path $CacheFile
 }

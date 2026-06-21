@@ -1,4 +1,4 @@
-function New-PCXCMDeviceCollectionInFolder {
+﻿function New-PCXCMDeviceCollectionInFolder {
 
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param(
@@ -8,7 +8,7 @@ function New-PCXCMDeviceCollectionInFolder {
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [string]$LimitingCollection = "All Systems",
+        [string]$LimitingCollection = (Get-PCXCMDefaultLimitingCollection),
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
@@ -131,7 +131,7 @@ New-PCXCMDeviceCollectionInFolder -CollectionName "PKG_7zip_Install"
 New-PCXCMDeviceCollectionInFolder -CollectionName "PKG_7zip_Install" -FolderPath "\DeviceCollection\Software"
 
 .EXAMPLE
-New-PCXCMDeviceCollectionInFolder -CollectionName "PKG_7zip_Uninstall" -LimitingCollection "All Systems" -FolderPath "\DeviceCollection\Software"
+New-PCXCMDeviceCollectionInFolder -CollectionName "PKG_7zip_Uninstall" -LimitingCollection "<YOUR_LIMITING_COLLECTION>" -FolderPath "\DeviceCollection\Software"
 
 .EXAMPLE
 New-PCXCMDeviceCollectionInFolder -CollectionName "PKG_7zip_2.0.0_[Install]" -FolderPath "\DeviceCollection\7zip"
@@ -146,5 +146,6 @@ System.Management.Automation.PSCustomObject (when -PassThru is used)
 Author  : PCXLab Automation Team
 Website : www.pcxlab.com
 #>
+
 
 

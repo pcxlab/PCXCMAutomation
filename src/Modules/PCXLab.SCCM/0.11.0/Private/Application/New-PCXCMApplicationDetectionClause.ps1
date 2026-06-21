@@ -45,5 +45,3 @@ throw
         Write-PCXOperationEnd -Status Success
     }
 }
-
-

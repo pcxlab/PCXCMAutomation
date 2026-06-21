@@ -8,7 +8,7 @@ function Import-PCXLabSCCMModule {
         return $ExistingModule
     }
 
-    $ModuleRoot = Join-Path $PSScriptRoot "..\..\..\src\Modules\PCXLab.SCCM"
+    $ModuleRoot = Join-Path $PSScriptRoot "..\..\..\..\src\Modules\PCXLab.SCCM"
     if (-not (Test-Path $ModuleRoot)) {
         throw "PCXLab.SCCM module folder not found at: $ModuleRoot"
     }

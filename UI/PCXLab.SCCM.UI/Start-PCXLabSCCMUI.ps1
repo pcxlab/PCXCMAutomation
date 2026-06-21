@@ -1,24 +1,33 @@
 #Requires -Version 5.1
 
+param(
+    [string]$Version = "1.0.0"
+)
+
 Add-Type -AssemblyName PresentationFramework
 
 $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$VersionPath = Join-Path $ScriptRoot $Version
 
-. (Join-Path $ScriptRoot "Functions\Import-PCXLabSCCMModule.ps1")
-. (Join-Path $ScriptRoot "Functions\Initialize-PCXLabSCCMUI.ps1")
-. (Join-Path $ScriptRoot "Functions\Get-PCXSourceMetadata.ps1")
-
-try {
-    #Initialize-PCXLabSCCMUI
-    [void](Initialize-PCXLabSCCMUI)
-    # $null = Initialize-PCXLabSCCMUI # TEST this if you are using this please 
-}
-catch {
-    [System.Windows.MessageBox]::Show(
-        $_.Exception.Message,
-        "Startup Error"
-    )
+if (-not (Test-Path $VersionPath)) {
+    [System.Windows.MessageBox]::Show("UI Version '$Version' not found at: $VersionPath", "Launch Error")
     return
 }
 
-& (Join-Path $ScriptRoot "Scripts\MainWindow.ps1")
+# Load essential UI functions from the specific version
+. (Join-Path $VersionPath "Functions\Import-PCXLabSCCMModule.ps1")
+. (Join-Path $VersionPath "Functions\Initialize-PCXLabSCCMUI.ps1")
+
+try {
+    Write-Host "Initializing PCXLab SCCM Unified Tool (v$Version)..." -ForegroundColor Cyan
+    
+    # Load module and validate requirements
+    [void](Initialize-PCXLabSCCMUI)
+    
+    # Launch the unified window script from the specific version folder
+    & (Join-Path $VersionPath "Scripts\UnifiedWindow.ps1")
+}
+catch {
+    [System.Windows.MessageBox]::Show($_.Exception.Message, "Startup Error")
+    Write-Error $_.Exception.Message
+}

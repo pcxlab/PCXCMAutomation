@@ -13,26 +13,13 @@ function Get-PCXCMCacheStatus {
             return
         }
 
-        $Results = Get-ChildItem `
-            -Path $CacheRoot `
-            -Filter *.metadata.json |
-        ForEach-Object {
+        $Results = Get-ChildItem -Path $CacheRoot -Filter *.metadata.json | ForEach-Object {
 
-            $Metadata = Get-Content `
-                -Path $_.FullName `
-                -Raw |
-                ConvertFrom-Json
+            $Metadata = Get-Content -Path $_.FullName -Raw | ConvertFrom-Json
 
-            $Created = [datetime]::Parse(
-                $Metadata.Created
-            )
+            $Created = [datetime]::Parse($Metadata.Created)
 
-            $AgeHours = [math]::Round(
-                (
-                    (Get-Date) - $Created
-                ).TotalHours,
-                2
-            )
+            $AgeHours = [math]::Round(((Get-Date) - $Created).TotalHours, 2)
 
             [PSCustomObject]@{
                 Name         = $Metadata.Name
@@ -40,29 +27,19 @@ function Get-PCXCMCacheStatus {
                 Created      = $Created
                 AgeHours     = $AgeHours
                 ExpiresHours = $Metadata.ExpiresHours
-                Expired      = (
-                    $AgeHours -ge
-                    $Metadata.ExpiresHours
-                )
+                Expired      = ($AgeHours -ge $Metadata.ExpiresHours)
             }
         }
 
         if ($Name) {
-
-            return $Results |
-                Where-Object {
-                    $_.Name -eq $Name
-                } |
-                Select-Object -First 1
+            return $Results | Where-Object { $_.Name -eq $Name } | Select-Object -First 1
         }
 
         return $Results
     }
     catch {
 
-        Write-PCXLog `
-            -Message $_.Exception.Message `
-            -Level ERROR
+        Write-PCXLog -Message $_.Exception.Message -Level ERROR
 
         throw
     }

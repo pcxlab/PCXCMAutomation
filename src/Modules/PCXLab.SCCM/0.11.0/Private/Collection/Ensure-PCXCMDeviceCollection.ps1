@@ -1,4 +1,4 @@
-function Ensure-PCXCMDeviceCollection {
+﻿function Ensure-PCXCMDeviceCollection {
    
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
@@ -8,7 +8,7 @@ function Ensure-PCXCMDeviceCollection {
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [string]$LimitingCollection = "All Systems"
+        [string]$LimitingCollection = (Get-PCXCMDefaultLimitingCollection)
     )
 
     try {
@@ -43,8 +43,9 @@ If not, creates it and returns the new collection.
 .EXAMPLE
 Ensure-PCXCMDeviceCollection `
     -Name "PCX - Test" `
-    -LimitingCollection "All Systems"
+    -LimitingCollection "<YOUR_LIMITING_COLLECTION>"
 #>
+
 
 
 

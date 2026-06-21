@@ -9,8 +9,9 @@ function Start-PCXCMContentDistribution {
         [Parameter(Mandatory, ParameterSetName = 'Package')]
         [string]$PackageName,
 
-        [Parameter()]
-        [string]$DistributionPointGroupName = "All Mangalore DPs"
+        [string[]]$DistributionPointGroups,
+
+        [string[]]$DistributionPoints
     )
 
     begin {
@@ -19,39 +20,83 @@ function Start-PCXCMContentDistribution {
 
     process {
         try {
+
+            if (-not $DistributionPointGroups -and -not $DistributionPoints) {
+                throw "At least one Distribution Point Group or Distribution Point must be specified."
+
+            }
+
+            Ensure-PCXCMConnection
+
             switch ($PSCmdlet.ParameterSetName) {
 
                 'Application' {
                     Write-PCXLog "Content Type : Application"
                     Write-PCXLog "Application : $ApplicationName"
-                    Write-PCXLog "DP Group : $DistributionPointGroupName"
+                    
+                    foreach ($DP in $DistributionPoints) {
 
-                    $null = Start-CMContentDistribution -ApplicationName $ApplicationName -DistributionPointGroupName $DistributionPointGroupName
+                        Write-PCXLog "DP : $DP"
 
-                    Write-PCXLog "Application content distribution initiated"
+                        $null = Start-CMContentDistribution `
+                            -ApplicationName $ApplicationName `
+                            -DistributionPointName $DP
+
+                        Write-PCXLog "Application distribution initiated to DP [$DP]"
+                    }
+
+                    foreach ($DPGroup in $DistributionPointGroups) {
+
+                        Write-PCXLog "DP Group : $DPGroup"
+
+                        $null = Start-CMContentDistribution `
+                            -ApplicationName $ApplicationName `
+                            -DistributionPointGroupName $DPGroup
+
+                        Write-PCXLog "Application distribution initiated to DP Group [$DPGroup]"
+                    }
 
                     return [PSCustomObject]@{
-                        Success                    = $true
-                        ContentType                = 'Application'
-                        Name                       = $ApplicationName
-                        DistributionPointGroupName = $DistributionPointGroupName
+                        Success                 = $true
+                        ContentType             = 'Application'
+                        Name                    = $ApplicationName
+                        DistributionPointGroups = $DistributionPointGroups
+                        DistributionPoints      = $DistributionPoints
                     }
                 }
 
                 'Package' {
                     Write-PCXLog "Content Type : Package"
                     Write-PCXLog "Package : $PackageName"
-                    Write-PCXLog "DP Group : $DistributionPointGroupName"
-
-                    $null = Start-CMContentDistribution -PackageName $PackageName -DistributionPointGroupName $DistributionPointGroupName
-
-                    Write-PCXLog "Package content distribution initiated"
                     
+                    foreach ($DP in $DistributionPoints) {
+
+                        Write-PCXLog "DP : $DP"
+
+                        $null = Start-CMContentDistribution `
+                            -PackageName $PackageName `
+                            -DistributionPointName $DP
+
+                        Write-PCXLog "Package distribution initiated to DP [$DP]"
+                    }
+
+                    foreach ($DPGroup in $DistributionPointGroups) {
+
+                        Write-PCXLog "DP Group : $DPGroup"
+
+                        $null = Start-CMContentDistribution `
+                            -PackageName $PackageName `
+                            -DistributionPointGroupName $DPGroup
+
+                        Write-PCXLog "Package distribution initiated to DP Group [$DPGroup]"
+                    }
+
                     return [PSCustomObject]@{
-                        Success                    = $true
-                        ContentType                = 'Package'
-                        Name                       = $PackageName
-                        DistributionPointGroupName = $DistributionPointGroupName
+                        Success                 = $true
+                        ContentType             = 'Package'
+                        Name                    = $PackageName
+                        DistributionPointGroups = $DistributionPointGroups
+                        DistributionPoints      = $DistributionPoints
                     }
                 }
             }

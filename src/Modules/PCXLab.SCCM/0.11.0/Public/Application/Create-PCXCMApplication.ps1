@@ -1,13 +1,17 @@
-function Create-PCXCMApplication {
+﻿function Create-PCXCMApplication {
 
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$Path,
         [string]$Language = "EN-US",
-        [string]$DPGroup = "All Mangalore Dps",
-        [string]$LimitingCollectionName = "All Systems",
+        [string[]]$DistributionPointGroups, # Array Difined
+        [string[]]$DistributionPoints, # Array Difined
+        [string]$LimitingCollectionName = (Get-PCXCMDefaultLimitingCollection),
         [string]$AvailableDateTime = (Get-Date -Format 'yyyy-MM-dd 00:00:00'),
-        [string]$DeadlineDateTime = ((Get-Date).AddDays(1).ToString('yyyy-MM-dd 00:00:00'))
+        [string]$DeadlineDateTime = ((Get-Date).AddDays(1).ToString('yyyy-MM-dd 00:00:00')),
+        [string]$ReferenceNumber,
+        [string]$ReviewerName,
+        [string]$Comments
     )
 
     begin {
@@ -39,25 +43,29 @@ function Create-PCXCMApplication {
             }
 
             # Step 1 - Create Application
-            $Application = New-PCXCMApplication -ApplicationName $ApplicationName -Description $ApplicationName -Publisher $Meta.Company -SoftwareVersion $Meta.Version -ReleaseDate (Get-Date) -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
+            #$Application = New-PCXCMApplication -ApplicationName $ApplicationName -Description $ApplicationName -Publisher $Meta.Company -SoftwareVersion $Meta.Version -ReleaseDate (Get-Date) -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
+            $null = New-PCXCMApplication -ApplicationName $ApplicationName -Description $ApplicationName -Publisher $Meta.Company -SoftwareVersion $Meta.Version -ReleaseDate (Get-Date) -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
 
             # Step 2 - Add Deployment Type
             New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $Installer.FullName
 
-            # Step 3 - Add Requirements to the Deployment Type
+            # Step 3 - Content Distribution
+            $null = Start-PCXCMContentDistribution `
+                -ApplicationName $ApplicationName `
+                -DistributionPointGroups $DistributionPointGroups `
+                -DistributionPoints $DistributionPoints
+
+            # Step 4 - Add Requirements to the Deployment Type
             $OSValidateSetPath = Join-Path $PSScriptRoot "..\..\Config\OSValidateSet.csv"
             if (Test-Path $OSValidateSetPath) {
-                Add-PCXCMApplicationOSRequirement -ApplicationName $ApplicationName -Requirement "All Windows 11 (64-bit)" -OSValidateSetPath $OSValidateSetPath -AllowRequirementCreation
+                $null = Add-PCXCMApplicationOSRequirement -ApplicationName $ApplicationName -Requirement "All Windows 11 (64-bit)" -OSValidateSetPath $OSValidateSetPath -AllowRequirementCreation
             }
             else {
                 Write-PCXLog "OS validation set not found. Skipping OS requirement." -Level WARNING
             }
 
-            Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
-            Add-PCXCMApplicationMemoryRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumMemoryMB 4096
-
-            # Step 4 - Content Distribution
-            Start-PCXCMContentDistribution -ApplicationName $ApplicationName -DistributionPointGroupName $DPGroup
+            $null = Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
+            $null = Add-PCXCMApplicationMemoryRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumMemoryMB 4096
 
             # Step 5 - Collections
             New-PCXCMDeploymentDeviceCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
@@ -74,13 +82,13 @@ function Create-PCXCMApplication {
             New-PCXCMApplicationDeployment @DeploymentParams -CollectionName $Collections.Uninstall -Action Uninstall -Purpose Required
 
             # Step 7 - Add Collection Rules
-            Set-PCXCMDeploymentCollectionRules -Collections $Collections
+            $null = Set-PCXCMDeploymentCollectionRules -Collections $Collections
 
             # Step 8 - Collection Movement to folders
-            Move-PCXCMCollectionsToFolder -Collections $Collections -meta $Meta -ObjectName $ApplicationName
-            
+            $null = Move-PCXCMCollectionsToFolder -Collections $Collections -Meta $Meta -ObjectName $ApplicationName
+
             # Step 9 - Application Movement to folders
-            Move-PCXCMApplicationToFolder -meta $Meta
+            $null = Move-PCXCMApplicationToFolder -Meta $Meta
 
             Write-PCXLog "SUCCESS: $ApplicationName"
         }
@@ -173,5 +181,6 @@ At line:1 char:1
    mdlets.AppMan.RemoveApplication
 
 #>
+
 
 

@@ -3,7 +3,7 @@ function Move-PCXCMApplicationToFolder {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [pscustomobject]$meta
+        [pscustomobject]$Meta
     )
 
     begin {
@@ -13,9 +13,9 @@ function Move-PCXCMApplicationToFolder {
     process {
         try {
 
-            $ApplicationName = "APP $($meta.Name)"
+            $ApplicationName = "APP $($Meta.Name)"
 
-            $folder = "\Application\Application Installation\$($meta.Company)\$($meta.Product)"
+            $folder = "\Application\Application Installation\$($Meta.Company)\$($Meta.Product)"
 
             $null = New-PCXCMFolder -Path $folder
 

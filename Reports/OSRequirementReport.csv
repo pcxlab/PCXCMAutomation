@@ -1,0 +1,7 @@
+﻿"ApplicationName","Requirement","Status","Message","Timestamp","PackageID","CIVersion","SourceSite","CreatedDate","CreatedBy","DateLastModified","LastModifiedBy"
+"Copilot Concern Shortcut 1.0","All Windows 11 (64-bit)","Failed","Application not found: Copilot Concern Shortcut 1.0","5/25/2026 9:20:57 PM",,,,,,,
+"APP Google Chrome 145.0.7632.46","All Windows 11 (64-bit)","Updated","Success","5/25/2026 9:21:00 PM","PS100074","16","PS1","5/25/2026 2:43:53 PM","PCXLAB\Administrator","5/25/2026 9:19:14 PM","PCXLAB\Administrator"
+"APP Igor Pavlov 7zip 26.0.0","All Windows 11 (64-bit)","AlreadyExists","Requirement already exists","5/25/2026 9:21:00 PM","PS100072","82","PS1","5/24/2026 7:52:02 AM","PCXLAB\Administrator","5/25/2026 9:19:34 PM","PCXLAB\Administrator"
+"APP Igor Pavlov 7zip 26.0.1 (SCRIPT Type)","All Windows 11 (64-bit)","AlreadyExists","Requirement already exists","5/25/2026 9:21:00 PM","PS100073","26","PS1","5/24/2026 2:55:50 PM","PCXLAB\Administrator","5/25/2026 8:56:59 PM","PCXLAB\Administrator"
+"APP TEST SCCM NATIVE REQUIREMENT","All Windows 11 (64-bit)","Updated","Success","5/25/2026 9:21:03 PM","PS100075","49","PS1","5/25/2026 5:01:12 PM","PCXLAB\Administrator","5/25/2026 9:06:43 PM","PCXLAB\Administrator"
+"Chrome 104.0","All Windows 11 (64-bit)","Failed","Application not found: Chrome 104.0","5/25/2026 9:21:03 PM",,,,,,,
