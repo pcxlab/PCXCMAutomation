@@ -45,13 +45,13 @@ Remove-CMDeviceCollection -Name "PKG Igor Pavlov 7zip 26.0.1 [UNINSTALL]" -Force
 Remove-CMDeviceCollection -Name "PKG Igor Pavlov 7zip 26.0.1 [AVAILABLE]" -Force
 Remove-CMPackage -Name "PKG Igor Pavlov 7zip 26.0.1" -Force
 
-Remove-CMFolder -FolderPath "PS1:\DeviceCollection\Mphasis Application Deployment\Igor Pavlov\7zip\PKG Igor Pavlov 7zip 26.0.1" -Force 
-Remove-CMFolder -FolderPath "PS1:\DeviceCollection\Mphasis Application Deployment\Igor Pavlov\7zip\APP Igor Pavlov 7zip 26.0.1" -Force 
-Remove-CMFolder -FolderPath "PS1:\DeviceCollection\Mphasis Application Deployment\Igor Pavlov\7zip\PKG Igor Pavlov 7zip 26.0.2" -Force 
-Remove-CMFolder -FolderPath "PS1:\DeviceCollection\Mphasis Application Deployment\Igor Pavlov\7zip\APP Igor Pavlov 7zip 26.0.2" -Force 
+Remove-CMFolder -FolderPath "PS1:\DeviceCollection\PCXLab Application Deployment\Igor Pavlov\7zip\PKG Igor Pavlov 7zip 26.0.1" -Force 
+Remove-CMFolder -FolderPath "PS1:\DeviceCollection\PCXLab Application Deployment\Igor Pavlov\7zip\APP Igor Pavlov 7zip 26.0.1" -Force 
+Remove-CMFolder -FolderPath "PS1:\DeviceCollection\PCXLab Application Deployment\Igor Pavlov\7zip\PKG Igor Pavlov 7zip 26.0.2" -Force 
+Remove-CMFolder -FolderPath "PS1:\DeviceCollection\PCXLab Application Deployment\Igor Pavlov\7zip\APP Igor Pavlov 7zip 26.0.2" -Force 
 
-Remove-CMFolder -FolderPath "PS1:\DeviceCollection\Mphasis Application Deployment\Igor Pavlov\7zip" -Force 
-Remove-CMFolder -FolderPath "PS1:\DeviceCollection\Mphasis Application Deployment" -Force 
+Remove-CMFolder -FolderPath "PS1:\DeviceCollection\PCXLab Application Deployment\Igor Pavlov\7zip" -Force 
+Remove-CMFolder -FolderPath "PS1:\DeviceCollection\PCXLab Application Deployment" -Force 
 Remove-CMFolder -FolderPath "PS1:\Application\Application Installation\Igor Pavlov\7zip" -Force
 Remove-CMFolder -FolderPath "PS1:\Application\Application Installation\" -Force # End slash will not work and it will fail
 Remove-CMFolder -FolderPath "PS1:\Application\Application Installation" -Force # without end slash it works
@@ -113,7 +113,6 @@ Get-ChildItem .\src\Modules\PCXLab.SCCM\0.11.0 -Recurse -Filter *.ps1 |
 Select-String 'Write-PCXOperationStart'
 
 Get-Content .\src\Modules\PCXLab.SCCM\0.11.0\Public\Applications\Create-PCXCMApplication.ps1
-sd
 
 Get-ChildItem .\src\Modules\PCXLab.SCCM\0.11.0 -Recurse -Filter *.ps1 |
 Select-String "Creating application deployment"
@@ -122,3 +121,7 @@ Select-String "Creating application deployment"
 
 "C:\Projects\PCXLABCMAutomation_ADDOSREQ\src\Modules\PCXLab.SCCM.UI\Start-PCXLabSCCMUI.ps1"
 .\src\Modules\PCXLab.SCCM.UI\Start-PCXLabSCCMUI.ps1
+
+
+git config --global user.name "PCXLab"
+git config --global user.email "pcxlabofficial@outlook.com"
