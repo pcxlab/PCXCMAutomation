@@ -1,1 +1,116 @@
-﻿MIT License
+﻿PCXLAB.SCCM SOFTWARE LICENSE TERMS
+
+Last Updated: June 2026
+
+These Software License Terms ("Agreement") are a legal agreement between you ("Licensee") and PCXLab ("Licensor") governing your use of the PCXLab.SCCM PowerShell module and associated documentation (collectively, the "Software").
+
+By installing, copying, accessing, or using the Software, you agree to be bound by the terms of this Agreement.
+
+1. LICENSE GRANT
+
+PCXLab grants you a non-exclusive, non-transferable, revocable, royalty-free license to install and use the Software solely for internal business, system administration, automation, testing, educational, and operational purposes within your organization.
+
+You may copy and redistribute unmodified copies of the Software provided that:
+
+* This Agreement is included with each copy.
+* All copyright notices and proprietary notices remain intact.
+* No fees are charged specifically for the Software itself.
+
+2. OWNERSHIP
+
+The Software is licensed, not sold.
+
+PCXLab retains all right, title, and interest in and to the Software, including all copyrights, trademarks, trade secrets, and other intellectual property rights.
+
+No rights are granted except those expressly stated in this Agreement.
+
+3. RESTRICTIONS
+
+You may not:
+
+a. Remove, alter, or obscure any copyright, trademark, or proprietary notices contained within the Software.
+
+b. Sell, lease, rent, sublicense, host as a service, or otherwise commercially distribute the Software as a standalone product.
+
+c. Represent the Software as your own work.
+
+d. Use the Software in violation of any applicable laws or regulations.
+
+4. MODIFICATIONS
+
+You may modify the Software for your internal use.
+
+You may not distribute, publish, or redistribute modified versions of the Software without prior written permission from PCXLab.
+
+5. THIRD-PARTY COMPONENTS
+
+The Software may reference or interact with third-party software, including Microsoft Configuration Manager, Microsoft Intune, Windows PowerShell, PowerShell modules, or other technologies.
+
+Such third-party software is governed by its own licensing terms, and PCXLab does not grant any rights to such software.
+
+6. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY.
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, PCXLAB DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO:
+
+* MERCHANTABILITY
+* FITNESS FOR A PARTICULAR PURPOSE
+* NON-INFRINGEMENT
+* ACCURACY OR COMPLETENESS OF RESULTS
+
+PCXLab DOES NOT WARRANT THAT THE SOFTWARE WILL OPERATE WITHOUT INTERRUPTION OR ERROR.
+
+7. NO SUPPORT
+
+PCXLab is under no obligation to provide support, maintenance, updates, bug fixes, enhancements, or modifications for the Software unless separately agreed in writing.
+
+8. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, PCXLAB SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:
+
+* LOSS OF PROFITS
+* LOSS OF DATA
+* LOSS OF BUSINESS OPPORTUNITIES
+* BUSINESS INTERRUPTION
+
+ARISING OUT OF OR RELATED TO THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF PCXLAB HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+IN NO EVENT SHALL PCXLAB'S TOTAL LIABILITY EXCEED INR 1,000 OR THE AMOUNT PAID FOR THE SOFTWARE, WHICHEVER IS GREATER.
+
+9. TERMINATION
+
+This Agreement automatically terminates if you fail to comply with any of its terms.
+
+Upon termination, you must immediately:
+
+* Stop using the Software.
+* Destroy all copies of the Software in your possession or control.
+
+Sections relating to ownership, warranty disclaimers, limitation of liability, and governing law shall survive termination.
+
+10. TRADEMARKS
+
+PCXLab, PCXLab.SCCM, PCXLab.Core, and related names, logos, and branding are trademarks or proprietary marks of PCXLab.
+
+Nothing in this Agreement grants any right to use PCXLab trademarks except as necessary to identify the Software.
+
+11. NO AFFILIATION WITH MICROSOFT
+
+PCXLab.SCCM is an independent software product.
+
+PCXLab is not affiliated with, endorsed by, sponsored by, or associated with Microsoft Corporation.
+
+Microsoft, Microsoft Intune, Configuration Manager, SCCM, Windows, and PowerShell are trademarks of Microsoft Corporation or their respective owners.
+
+12. GOVERNING LAW
+
+This Agreement shall be governed by and construed in accordance with the laws of India, without regard to conflict of law principles.
+
+Any disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the courts located in Karnataka, India.
+
+13. ENTIRE AGREEMENT
+
+This Agreement constitutes the entire agreement between the parties concerning the Software and supersedes all prior or contemporaneous communications regarding the Software.
+
+By installing, copying, accessing, or using PCXLab.SCCM, you acknowledge that you have read, understood, and agree to be bound by these Software License Terms.
