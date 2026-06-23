@@ -126,3 +126,5 @@ Select-String "Creating application deployment"
 git config --global user.name "PCXLab"
 git config --global user.email "[EMAIL_ADDRESS]"
 git config --list
+
+# Test push
