@@ -124,4 +124,5 @@ Select-String "Creating application deployment"
 
 
 git config --global user.name "PCXLab"
-git config --global user.email "pcxlabofficial@outlook.com"
+git config --global user.email "[EMAIL_ADDRESS]"
+git config --list
