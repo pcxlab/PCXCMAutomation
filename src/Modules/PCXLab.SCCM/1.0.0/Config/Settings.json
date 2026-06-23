@@ -1,0 +1,18 @@
+﻿{
+    "DefaultLimitingCollection": "All Systems",
+    "_DefaultLimitingCollectionExample": "PCXLAB - TEST LIMITING COLLECTION [PREVIEW]",
+
+    "EnableFallbackData": true,
+
+    "FallbackDistributionPointGroups": [
+        "PCXLAB Fallback DP Group - TEST"
+    ],
+
+    "FallbackDistributionPoints": [
+        "PCXLAB Fallback DP - TEST"
+    ],
+
+    "FallbackCloudManagementGateways": [
+        "PCXLAB Fallback CMG - TEST"
+    ]
+}
