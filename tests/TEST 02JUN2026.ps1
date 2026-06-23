@@ -113,7 +113,7 @@ Get-ChildItem .\src\Modules\PCXLab.SCCM\0.11.0 -Recurse -Filter *.ps1 |
 Select-String 'Write-PCXOperationStart'
 
 Get-Content .\src\Modules\PCXLab.SCCM\0.11.0\Public\Applications\Create-PCXCMApplication.ps1
-
+sd
 
 Get-ChildItem .\src\Modules\PCXLab.SCCM\0.11.0 -Recurse -Filter *.ps1 |
 Select-String "Creating application deployment"
