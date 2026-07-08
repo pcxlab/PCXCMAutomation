@@ -128,3 +128,37 @@ git config --global user.email "[EMAIL_ADDRESS]"
 git config --list
 
 # Test push
+
+
+
+# Test push
+
+C:
+Remove-Module PCXLab.SCCM -Force
+Remove-Module PCXLab.SCCM
+Clear-Host
+Import-Module .\src\Modules\PCXLab.SCCM
+#Import-Module .\src\Modules\PCXLab.SCCM -Force
+
+get-module -Name PCXLab.SCCM
+Get-Command -Module PCXLab.SCCM
+
+$script:PCXSettings | ConvertTo-Json -Depth 10
+
+Create-PCXCMPackage -Path "\\192.168.25.214\Package_Source\Applications\Igor Pavlov\7zip\7zip 26.0.4"
+Test-Path "\\192.168.25.214\Package_Source\Icons\Igor Pavlov7zip.png"
+Get-Item "\\192.168.25.214\Package_Source\Icons\Igor Pavlov7zip.png"
+
+
+Get-ChildItem .\src\Modules\PCXLab.SCCM\1.0.2 -Recurse -Include *.ps1 |
+    Select-String -Pattern "PCXSettings|Settings.json|ConvertFrom-Json"
+
+    Get-PCXCMSetting -Name "Package.DistributionSettings.Priority"
+
+    Get-PCXCMPackageDistributionPriority
+
+
+    Get-PCXCMSetting -Name "DefaultLimitingCollection"
+Get-PCXCMSetting -Name "Package.DistributionSettings.Priority"
+Get-PCXCMSetting -Name "IconSettings.SecondaryIconFolder"
+Get-PCXCMSetting -Name "IconSettings.EnableSecondaryLookup"
