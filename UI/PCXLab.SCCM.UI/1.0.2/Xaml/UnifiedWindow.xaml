@@ -148,8 +148,8 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-                                        <Label Content="Comments:" Foreground="#666666" Padding="0" />
-                                        <TextBox x:Name="txtComments" Margin="0,3,0,0" Height="50" BorderBrush="#CCCCCC" Padding="3" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+                                        <Label Content="Comment:" Foreground="#666666" Padding="0" />
+                                        <TextBox x:Name="txtComment" Margin="0,3,0,0" Height="50" BorderBrush="#CCCCCC" Padding="3" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>

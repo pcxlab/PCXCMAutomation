@@ -35,7 +35,7 @@ $pnlAppName     = $Window.FindName("pnlAppName")
 $pnlPkgName     = $Window.FindName("pnlPkgName")
 $txtRefNumber   = $Window.FindName("txtRefNumber")
 $txtReviewer    = $Window.FindName("txtReviewer")
-$txtComments    = $Window.FindName("txtComments")
+$txtComment    = $Window.FindName("txtComment")
 
 # State
 $script:LastLoadedSourcePath = ''
@@ -188,7 +188,7 @@ function Show-PCXCMConfirmDialog {
         [string[]]$CMGs,
         [string]$RefNumber,
         [string]$Reviewer,
-        [string]$Comments
+        [string]$Comment
     )
 
     $ConfirmXamlPath = Join-Path (Split-Path $PSScriptRoot -Parent) "Xaml\ConfirmWindow.xaml"
@@ -208,7 +208,7 @@ function Show-PCXCMConfirmDialog {
     $cTxtCMGs      = $cWindow.FindName("txtConfCMGs")
     $cTxtRef       = $cWindow.FindName("txtConfRef")
     $cTxtReviewer  = $cWindow.FindName("txtConfReviewer")
-    $cTxtComments  = $cWindow.FindName("txtConfComments")
+    $cTxtComment  = $cWindow.FindName("txtConfComment")
     $cBtnBack      = $cWindow.FindName("btnConfBack")
     $cBtnProceed   = $cWindow.FindName("btnConfProceed")
 
@@ -224,7 +224,7 @@ function Show-PCXCMConfirmDialog {
     $cTxtCMGs.Text     = $(if ($CMGs.Count -gt 0) { $CMGs -join ", " } else { "None" })
     $cTxtRef.Text      = $RefNumber
     $cTxtReviewer.Text = $Reviewer
-    $cTxtComments.Text = $Comments
+    $cTxtComment.Text = $Comment
 
     # Context Aware Button
     if ($Type -eq "Application") {
@@ -367,7 +367,7 @@ $btnCreate.Add_Click({
         -CMGs $SelectedCMGs `
         -RefNumber $txtRefNumber.Text `
         -Reviewer $txtReviewer.Text `
-        -Comments $txtComments.Text
+        -Comment $txtComment.Text
 
     if (-not $Confirmed) {
         return
@@ -390,7 +390,7 @@ $btnCreate.Add_Click({
             Path = $Path
             ReferenceNumber = $txtRefNumber.Text
             ReviewerName = $txtReviewer.Text
-            Comments = $txtComments.Text
+            Comment = $txtComment.Text
         }
 
         if ($SelectedGroups.Count -gt 0) {

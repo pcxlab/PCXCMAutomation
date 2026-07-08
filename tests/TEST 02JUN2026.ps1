@@ -162,3 +162,10 @@ Get-ChildItem .\src\Modules\PCXLab.SCCM\1.0.2 -Recurse -Include *.ps1 |
 Get-PCXCMSetting -Name "Package.DistributionSettings.Priority"
 Get-PCXCMSetting -Name "IconSettings.SecondaryIconFolder"
 Get-PCXCMSetting -Name "IconSettings.EnableSecondaryLookup"
+
+
+
+New-PCXCMPackage -PackageName "PKG_7zip_2.0.1" -Company "Igor_Pavlov" -Version "2.0.0" -Language "EN-US" -Path "\\192.168.25.214\Package_Source\Applications\Igor_Pavlov\7zip\7zip_2.0.0" 
+
+New-CMPackage -comment 
+

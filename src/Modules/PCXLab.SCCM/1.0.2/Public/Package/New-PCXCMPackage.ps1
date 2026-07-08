@@ -15,7 +15,10 @@ function New-PCXCMPackage {
         [string]$Language = "EN-US",
 
         [parameter(Mandatory = $true, Position = 4)]  
-        [string]$Path
+        [string]$Path,
+
+        [parameter(Mandatory = $false)]
+        [string]$Description
     )
 
     begin {
@@ -30,7 +33,23 @@ function New-PCXCMPackage {
             
             Write-PCXLog "Creating package: $PackageName"
 
-            $Package = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -ErrorAction Stop
+            #$Package = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -Description $Description -ErrorAction Stop
+
+            $Params = @{
+                Name         = $PackageName
+                Manufacturer = $Company
+                Version      = $Version
+                Language     = $Language
+                Path         = $Path
+                ErrorAction  = 'Stop'
+            }
+            
+            if ($Description) {
+                $Params.Description = $Description
+            }
+            
+            $Package = New-CMPackage @Params
+
             Write-PCXLog "Package created: $PackageName"
             
             $Priority = Get-PCXCMPackageDistributionPriority

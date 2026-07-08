@@ -11,7 +11,7 @@
         [string]$LimitingCollectionName = (Get-PCXCMDefaultLimitingCollection),
         [string]$ReferenceNumber,
         [string]$ReviewerName,
-        [string]$Comments
+        [string]$Comment
     )
 
     begin {
@@ -39,9 +39,9 @@
             Write-PCXLog "Package: $PackageName"
             Write-PCXLog "Installer: $($Installer.Name)"
             
-            Write-PCXLog "Ticket Reference Number is : $ReferenceNumber"
-            Write-PCXLog "Reviewer Name is : $ReviewerName"
-            Write-PCXLog "Comments is : $Comments"  
+            Write-PCXLog "Reference Number : $ReferenceNumber"
+            Write-PCXLog "Reviewer         : $ReviewerName"
+            Write-PCXLog "Comment          : $Comment"
 
             # Resolve Application Icon
             $Icon = Get-PCXCMApplicationIcon `
@@ -63,8 +63,17 @@
 
             $Platforms = Get-CMSupportedPlatform -Fast | Where-Object { $_.DisplayText -like "*Windows 11*" }
 
-            #$Package = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
-            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path
+            # Package comment
+            $PackageDescription = New-PCXCMComment `
+                -Reviewer $ReviewerName `
+                -RequestNumber $ReferenceNumber `
+                -Comment $Comment
+
+            Write-PCXLog "Package Description:"
+            Write-PCXLog $PackageDescription
+
+            #$null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path 
+            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path -Description $PackageDescription
 
             # Set package icon
             if ($Icon -and $Icon.Found) {
@@ -75,13 +84,6 @@
                 -PackageName $PackageName `
                 -DistributionPointGroups $DistributionPointGroups `
                 -DistributionPoints $DistributionPoints
-
-            <#
-            if ($Icon.Found) {  # <-- ADD THIS LINE
-                $null = Set-PCXCMPackageIcon -PackageName $PackageName -IconPath $Icon.Path
-            }
-
-            #>
 
             $AvailableCommand = Get-PCXCMCommandLineForPackage -Type "Available" -Installer $Installer -FileMap $FileMap
             $InstallCommand = Get-PCXCMCommandLineForPackage -Type "Install" -Installer $Installer -FileMap $FileMap
@@ -101,7 +103,6 @@
                 }
             }
 
-            #Add-PCXCMPackageProgram -PackageName $PackageName -Type "OSD" -CommandLine $OSDCommand -Platforms $Platforms
             Add-PCXCMPackageProgram -PackageName $PackageName -Type "OSD" -CommandLine $OSDCommand #-Platforms $Platforms
 
             New-PCXCMDeploymentDeviceCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
