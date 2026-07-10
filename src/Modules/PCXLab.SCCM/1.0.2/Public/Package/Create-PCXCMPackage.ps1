@@ -4,7 +4,6 @@
     param(
         [Parameter(Mandatory)]
         [string]$Path,
-
         [string]$Language = "EN-US",
         [string[]]$DistributionPointGroups, # Array Difined
         [string[]]$DistributionPoints, # Array Difined
@@ -44,10 +43,7 @@
             Write-PCXLog "Comment          : $Comment"
 
             # Resolve Application Icon
-            $Icon = Get-PCXCMApplicationIcon `
-                -SourcePath $Path `
-                -Company $Meta.Company `
-                -Product $Meta.Product
+            $Icon = Get-PCXCMApplicationIcon -SourcePath $Path -Company $Meta.Company -Product $Meta.Product
                 
             Write-PCXLog "Icon: $($Icon)"
             Write-PCXLog "Icon Path: $($Icon.Path)"
@@ -64,26 +60,18 @@
             $Platforms = Get-CMSupportedPlatform -Fast | Where-Object { $_.DisplayText -like "*Windows 11*" }
 
             # Package comment
-            $PackageDescription = New-PCXCMComment `
-                -Reviewer $ReviewerName `
-                -RequestNumber $ReferenceNumber `
-                -Comment $Comment
+            $Description = New-PCXCMDescription -Reviewer $ReviewerName -RequestNumber $ReferenceNumber -Comment $Comment
 
             Write-PCXLog "Package Description:"
-            Write-PCXLog $PackageDescription
+            Write-PCXLog $Description
 
-            #$null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path 
-            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path -Description $PackageDescription
+            $null = New-PCXCMPackage -PackageName $PackageName -Company $meta.Company -Version $meta.Version -Language $Language -Path $Path -Description $Description
 
-            # Set package icon
             if ($Icon -and $Icon.Found) {
                 $null = Set-PCXCMPackageIcon -PackageName $PackageName -IconPath $Icon.Path
             }
 
-            $null = Start-PCXCMContentDistribution `
-                -PackageName $PackageName `
-                -DistributionPointGroups $DistributionPointGroups `
-                -DistributionPoints $DistributionPoints
+            $null = Start-PCXCMContentDistribution -PackageName $PackageName -DistributionPointGroups $DistributionPointGroups -DistributionPoints $DistributionPoints
 
             $AvailableCommand = Get-PCXCMCommandLineForPackage -Type "Available" -Installer $Installer -FileMap $FileMap
             $InstallCommand = Get-PCXCMCommandLineForPackage -Type "Install" -Installer $Installer -FileMap $FileMap

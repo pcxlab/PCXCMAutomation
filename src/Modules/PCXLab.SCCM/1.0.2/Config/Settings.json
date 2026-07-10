@@ -1,31 +1,23 @@
 ﻿{
     "Collections": {
         "DefaultLimitingCollection": "PCXLAB - TEST MACHINES",
-
         "_DefaultLimitingCollectionExamples": [
             "All Systems",
             "PCXLAB - TEST LIMITING COLLECTION [PREVIEW]"
         ],
-
         "EnableDefaultTestMachinesMembership": true,
-
         "DefaultTestMachinesCollection": "PCXLAB - TEST MACHINES"
     },
-
     "EnableFallbackData": true,
-
     "FallbackDistributionPointGroups": [
         "PCXLAB Fallback DP Group - TEST"
     ],
-
     "FallbackDistributionPoints": [
         "PCXLAB Fallback DP - TEST"
     ],
-
     "FallbackCloudManagementGateways": [
         "PCXLAB Fallback CMG - TEST"
     ],
-
     "IconSettings": {
         "EnableSecondaryLookup": true,
         "SecondaryIconFolder": "\\\\192.168.25.214\\Package_Source\\Icons\\",
@@ -36,10 +28,13 @@
             ".jpeg"
         ]
     },
-
     "Package": {
         "DistributionSettings": {
             "Priority": "Low"
         }
+    },
+    "DescriptionSettings": {
+        "MaximumLength": 127,
+        "DateFormat": "dd-MMM-yy HH:mm"
     }
 }

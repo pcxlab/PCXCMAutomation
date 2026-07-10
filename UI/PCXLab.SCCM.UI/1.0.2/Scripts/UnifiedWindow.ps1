@@ -16,26 +16,27 @@ $reader = New-Object System.Xml.XmlNodeReader $xaml
 $Window = [Windows.Markup.XamlReader]::Load($reader)
 
 # Map UI Controls
-$txtSourcePath   = $Window.FindName("txtSourcePath")
-$btnBrowse       = $Window.FindName("btnBrowse")
-$txtAppName      = $Window.FindName("txtAppName")
-$txtPkgName      = $Window.FindName("txtPkgName")
-$txtCompany      = $Window.FindName("txtCompany")
-$txtProduct      = $Window.FindName("txtProduct")
-$txtVersion      = $Window.FindName("txtVersion")
-$pnlDPGroups     = $Window.FindName("pnlDPGroups")
-$pnlDPs          = $Window.FindName("pnlDPs")
-$pnlCMGs         = $Window.FindName("pnlCMGs")
-$btnRefreshDPs   = $Window.FindName("btnRefreshDPs")
-$radApp          = $Window.FindName("radApp")
-$radPkg          = $Window.FindName("radPkg")
-$btnCreate       = $Window.FindName("btnCreate")
-$txtStatus       = $Window.FindName("txtStatus")
-$pnlAppName     = $Window.FindName("pnlAppName")
-$pnlPkgName     = $Window.FindName("pnlPkgName")
-$txtRefNumber   = $Window.FindName("txtRefNumber")
-$txtReviewer    = $Window.FindName("txtReviewer")
-$txtComment    = $Window.FindName("txtComment")
+$txtSourcePath = $Window.FindName("txtSourcePath")
+$btnBrowse = $Window.FindName("btnBrowse")
+$txtAppName = $Window.FindName("txtAppName")
+$txtPkgName = $Window.FindName("txtPkgName")
+$txtCompany = $Window.FindName("txtCompany")
+$txtProduct = $Window.FindName("txtProduct")
+$txtVersion = $Window.FindName("txtVersion")
+$pnlDPGroups = $Window.FindName("pnlDPGroups")
+$pnlDPs = $Window.FindName("pnlDPs")
+$pnlCMGs = $Window.FindName("pnlCMGs")
+$btnRefreshDPs = $Window.FindName("btnRefreshDPs")
+$radApp = $Window.FindName("radApp")
+$radPkg = $Window.FindName("radPkg")
+$btnCreate = $Window.FindName("btnCreate")
+$txtStatus = $Window.FindName("txtStatus")
+$pnlAppName = $Window.FindName("pnlAppName")
+$pnlPkgName = $Window.FindName("pnlPkgName")
+$txtRefNumber = $Window.FindName("txtRefNumber")
+$txtReviewer = $Window.FindName("txtReviewer")
+$txtComment = $Window.FindName("txtComment")
+$lblComment = $Window.FindName("lblComment")
 
 # State
 $script:LastLoadedSourcePath = ''
@@ -50,9 +51,9 @@ function Write-GUIStatus {
     $FormattedMessage = "[$Timestamp] [$Level] $Message`r`n"
     
     $Window.Dispatcher.Invoke({
-        $txtStatus.AppendText($FormattedMessage)
-        $txtStatus.ScrollToEnd()
-    })
+            $txtStatus.AppendText($FormattedMessage)
+            $txtStatus.ScrollToEnd()
+        })
 }
 
 # ------------------------------------------------------------
@@ -65,47 +66,47 @@ function Refresh-DistributionLists {
     Write-GUIStatus "Refreshing Distribution Point and Group lists..."
     
     $Window.Dispatcher.Invoke({
-        $pnlDPGroups.Children.Clear()
-        $pnlDPs.Children.Clear()
-        $pnlCMGs.Children.Clear()
+            $pnlDPGroups.Children.Clear()
+            $pnlDPs.Children.Clear()
+            $pnlCMGs.Children.Clear()
         
-        try {
-            #$Groups = Get-PCXCMDPGroups -ForceRefresh:$ForceRefresh
-            $Groups = @(Get-PCXCMDPGroups -ForceRefresh:$ForceRefresh)
-            foreach ($G in $Groups) { 
-                $CheckBox = New-Object System.Windows.Controls.CheckBox
-                $CheckBox.Content = $G
-                $CheckBox.Margin = "2"
-                $CheckBox.Foreground = [System.Windows.Media.Brushes]::Black
-                [void]$pnlDPGroups.Children.Add($CheckBox)
-            }
+            try {
+                #$Groups = Get-PCXCMDPGroups -ForceRefresh:$ForceRefresh
+                $Groups = @(Get-PCXCMDPGroups -ForceRefresh:$ForceRefresh)
+                foreach ($G in $Groups) { 
+                    $CheckBox = New-Object System.Windows.Controls.CheckBox
+                    $CheckBox.Content = $G
+                    $CheckBox.Margin = "2"
+                    $CheckBox.Foreground = [System.Windows.Media.Brushes]::Black
+                    [void]$pnlDPGroups.Children.Add($CheckBox)
+                }
 
-            #$DPs = Get-PCXCMDPs -ForceRefresh:$ForceRefresh
-            $DPs = @(Get-PCXCMDPs -ForceRefresh:$ForceRefresh)
-            foreach ($D in $DPs) { 
-                $CheckBox = New-Object System.Windows.Controls.CheckBox
-                $CheckBox.Content = $D
-                $CheckBox.Margin = "2"
-                $CheckBox.Foreground = [System.Windows.Media.Brushes]::Black
-                [void]$pnlDPs.Children.Add($CheckBox)
-            }
+                #$DPs = Get-PCXCMDPs -ForceRefresh:$ForceRefresh
+                $DPs = @(Get-PCXCMDPs -ForceRefresh:$ForceRefresh)
+                foreach ($D in $DPs) { 
+                    $CheckBox = New-Object System.Windows.Controls.CheckBox
+                    $CheckBox.Content = $D
+                    $CheckBox.Margin = "2"
+                    $CheckBox.Foreground = [System.Windows.Media.Brushes]::Black
+                    [void]$pnlDPs.Children.Add($CheckBox)
+                }
 
-            #$CMGs = Get-PCXCMCMGs -ForceRefresh:$ForceRefresh
-            $CMGs = @(Get-PCXCMCMGs -ForceRefresh:$ForceRefresh)
-            foreach ($C in $CMGs) { 
-                $CheckBox = New-Object System.Windows.Controls.CheckBox
-                $CheckBox.Content = $C
-                $CheckBox.Margin = "2"
-                $CheckBox.Foreground = [System.Windows.Media.Brushes]::Black
-                [void]$pnlCMGs.Children.Add($CheckBox)
-            }
+                #$CMGs = Get-PCXCMCMGs -ForceRefresh:$ForceRefresh
+                $CMGs = @(Get-PCXCMCMGs -ForceRefresh:$ForceRefresh)
+                foreach ($C in $CMGs) { 
+                    $CheckBox = New-Object System.Windows.Controls.CheckBox
+                    $CheckBox.Content = $C
+                    $CheckBox.Margin = "2"
+                    $CheckBox.Foreground = [System.Windows.Media.Brushes]::Black
+                    [void]$pnlCMGs.Children.Add($CheckBox)
+                }
             
-            Write-GUIStatus "Successfully loaded $($Groups.Count) Groups, $($DPs.Count) DPs and $($CMGs.Count) CMGs."
-        }
-        catch {
-            Write-GUIStatus "Failed to load distribution lists: $($_.Exception.Message)" "ERROR"
-        }
-    })
+                Write-GUIStatus "Successfully loaded $($Groups.Count) Groups, $($DPs.Count) DPs and $($CMGs.Count) CMGs."
+            }
+            catch {
+                Write-GUIStatus "Failed to load distribution lists: $($_.Exception.Message)" "ERROR"
+            }
+        })
 }
 
 # ------------------------------------------------------------
@@ -117,12 +118,12 @@ function Update-Metadata {
 
     if ([string]::IsNullOrWhiteSpace($Path)) {
         $Window.Dispatcher.Invoke({
-            $txtAppName.Text = ""
-            $txtPkgName.Text = ""
-            $txtCompany.Text = ""
-            $txtProduct.Text = ""
-            $txtVersion.Text = ""
-        })
+                $txtAppName.Text = ""
+                $txtPkgName.Text = ""
+                $txtCompany.Text = ""
+                $txtProduct.Text = ""
+                $txtVersion.Text = ""
+            })
         return
     }
 
@@ -148,27 +149,53 @@ function Update-Metadata {
         }
 
         $Window.Dispatcher.Invoke({
-            $txtCompany.Text = $Metadata.Company
-            $txtProduct.Text = $Metadata.Product
-            $txtVersion.Text = $DisplayVersion
-            $txtAppName.Text = "APP $($Metadata.Name)"
-            $txtPkgName.Text = "PKG $($Metadata.Name)"
-        })
+                $txtCompany.Text = $Metadata.Company
+                $txtProduct.Text = $Metadata.Product
+                $txtVersion.Text = $DisplayVersion
+                $txtAppName.Text = "APP $($Metadata.Name)"
+                $txtPkgName.Text = "PKG $($Metadata.Name)"
+            })
 
         $script:LastLoadedSourcePath = $Path
         Write-GUIStatus "Successfully identified: $($Metadata.Name) (Version: $DisplayVersion)"
     }
     catch {
         $Window.Dispatcher.Invoke({
-            $txtAppName.Text = ""
-            $txtPkgName.Text = ""
-            $txtCompany.Text = ""
-            $txtProduct.Text = ""
-            $txtVersion.Text = ""
-        })
+                $txtAppName.Text = ""
+                $txtPkgName.Text = ""
+                $txtCompany.Text = ""
+                $txtProduct.Text = ""
+                $txtVersion.Text = ""
+            })
         $script:LastLoadedSourcePath = ''
         Write-GUIStatus "Path Validation Failed: $($_.Exception.Message)" "ERROR"
     }
+}
+
+function Update-CommentCharacterCount {
+
+    $Info = Get-PCXCMDescriptionInformation `
+        -Reviewer $txtReviewer.Text `
+        -RequestNumber $txtRefNumber.Text `
+        -Comment $txtComment.Text
+
+    # Trim comment if it exceeds the allowed length
+    if ($txtComment.Text.Length -gt $Info.AllowedCommentLength) {
+
+        $Caret = $txtComment.CaretIndex
+
+        $txtComment.Text = $txtComment.Text.Substring(0, $Info.AllowedCommentLength)
+
+        $txtComment.CaretIndex = [Math]::Min($Caret, $txtComment.Text.Length)
+
+        # Refresh after trimming
+        $Info = Get-PCXCMDescriptionInformation `
+            -Reviewer $txtReviewer.Text `
+            -RequestNumber $txtRefNumber.Text `
+            -Comment $txtComment.Text
+    }
+
+    $lblComment.Content = "Comment ($($Info.RemainingCharacters) left | $($Info.DescriptionLength)/$($Info.MaximumCharacters))"
 }
 
 # ------------------------------------------------------------
@@ -197,32 +224,32 @@ function Show-PCXCMConfirmDialog {
     $cWindow = [Windows.Markup.XamlReader]::Load($cReader)
 
     # Map Controls
-    $cTxtSource    = $cWindow.FindName("txtConfSource")
-    $cTxtType      = $cWindow.FindName("txtConfType")
-    $cTxtName      = $cWindow.FindName("txtConfName")
-    $cTxtCompany   = $cWindow.FindName("txtConfCompany")
-    $cTxtProduct   = $cWindow.FindName("txtConfProduct")
-    $cTxtVersion   = $cWindow.FindName("txtConfVersion")
-    $cTxtGroups    = $cWindow.FindName("txtConfGroups")
-    $cTxtDPs       = $cWindow.FindName("txtConfDPs")
-    $cTxtCMGs      = $cWindow.FindName("txtConfCMGs")
-    $cTxtRef       = $cWindow.FindName("txtConfRef")
-    $cTxtReviewer  = $cWindow.FindName("txtConfReviewer")
-    $cTxtComment  = $cWindow.FindName("txtConfComment")
-    $cBtnBack      = $cWindow.FindName("btnConfBack")
-    $cBtnProceed   = $cWindow.FindName("btnConfProceed")
+    $cTxtSource = $cWindow.FindName("txtConfSource")
+    $cTxtType = $cWindow.FindName("txtConfType")
+    $cTxtName = $cWindow.FindName("txtConfName")
+    $cTxtCompany = $cWindow.FindName("txtConfCompany")
+    $cTxtProduct = $cWindow.FindName("txtConfProduct")
+    $cTxtVersion = $cWindow.FindName("txtConfVersion")
+    $cTxtGroups = $cWindow.FindName("txtConfGroups")
+    $cTxtDPs = $cWindow.FindName("txtConfDPs")
+    $cTxtCMGs = $cWindow.FindName("txtConfCMGs")
+    $cTxtRef = $cWindow.FindName("txtConfRef")
+    $cTxtReviewer = $cWindow.FindName("txtConfReviewer")
+    $cTxtComment = $cWindow.FindName("txtConfComment")
+    $cBtnBack = $cWindow.FindName("btnConfBack")
+    $cBtnProceed = $cWindow.FindName("btnConfProceed")
 
     # Populate Data
-    $cTxtSource.Text   = $SourcePath
-    $cTxtType.Text     = $Type
-    $cTxtName.Text     = $Name
-    $cTxtCompany.Text  = $Company
-    $cTxtProduct.Text  = $Product
-    $cTxtVersion.Text  = $Version
-    $cTxtGroups.Text   = $(if ($Groups.Count -gt 0) { $Groups -join ", " } else { "None" })
-    $cTxtDPs.Text      = $(if ($DPs.Count -gt 0) { $DPs -join ", " } else { "None" })
-    $cTxtCMGs.Text     = $(if ($CMGs.Count -gt 0) { $CMGs -join ", " } else { "None" })
-    $cTxtRef.Text      = $RefNumber
+    $cTxtSource.Text = $SourcePath
+    $cTxtType.Text = $Type
+    $cTxtName.Text = $Name
+    $cTxtCompany.Text = $Company
+    $cTxtProduct.Text = $Product
+    $cTxtVersion.Text = $Version
+    $cTxtGroups.Text = $(if ($Groups.Count -gt 0) { $Groups -join ", " } else { "None" })
+    $cTxtDPs.Text = $(if ($DPs.Count -gt 0) { $DPs -join ", " } else { "None" })
+    $cTxtCMGs.Text = $(if ($CMGs.Count -gt 0) { $CMGs -join ", " } else { "None" })
+    $cTxtRef.Text = $RefNumber
     $cTxtReviewer.Text = $Reviewer
     $cTxtComment.Text = $Comment
 
@@ -239,13 +266,13 @@ function Show-PCXCMConfirmDialog {
     $script:ConfirmResult = $false
 
     $cBtnBack.Add_Click({
-        $cWindow.Close()
-    })
+            $cWindow.Close()
+        })
 
     $cBtnProceed.Add_Click({
-        $script:ConfirmResult = $true
-        $cWindow.Close()
-    })
+            $script:ConfirmResult = $true
+            $cWindow.Close()
+        })
 
     $cWindow.ShowDialog() | Out-Null
     return $script:ConfirmResult
@@ -255,53 +282,66 @@ function Show-PCXCMConfirmDialog {
 # Event Handlers
 # ------------------------------------------------------------
 
+# Update character count while typing
+$txtRefNumber.Add_TextChanged({
+        Update-CommentCharacterCount
+    })
+
+$txtReviewer.Add_TextChanged({
+        Update-CommentCharacterCount
+    })
+
+$txtComment.Add_TextChanged({
+        Update-CommentCharacterCount
+    })
+
 # Radio Button Handlers
 $radApp.Add_Checked({
-    $btnCreate.Content = "CREATE APPLICATION"
-    $btnCreate.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#107C10")
-    $pnlAppName.Visibility = "Visible"
-    $pnlPkgName.Visibility = "Collapsed"
-})
+        $btnCreate.Content = "CREATE APPLICATION"
+        $btnCreate.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#107C10")
+        $pnlAppName.Visibility = "Visible"
+        $pnlPkgName.Visibility = "Collapsed"
+    })
 
 $radPkg.Add_Checked({
-    $btnCreate.Content = "CREATE PACKAGE"
-    $btnCreate.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#0078D4")
-    $pnlAppName.Visibility = "Collapsed"
-    $pnlPkgName.Visibility = "Visible"
-})
+        $btnCreate.Content = "CREATE PACKAGE"
+        $btnCreate.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#0078D4")
+        $pnlAppName.Visibility = "Collapsed"
+        $pnlPkgName.Visibility = "Visible"
+    })
 
 # Modern Browse Logic (Pick File -> Use Parent Folder)
 $btnBrowse.Add_Click({
-    try {
-        $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
-        $FileBrowser.Title = "Select any file inside the source folder"
-        $FileBrowser.Filter = "All Files (*.*)|*.*"
+        try {
+            $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
+            $FileBrowser.Title = "Select any file inside the source folder"
+            $FileBrowser.Filter = "All Files (*.*)|*.*"
         
-        # Set initial directory if current path exists
-        $CurrentPath = $txtSourcePath.Text.Trim()
-        if (-not [string]::IsNullOrWhiteSpace($CurrentPath)) {
-            if (Test-Path $CurrentPath) { 
-                $FileBrowser.InitialDirectory = $(if (Test-Path $CurrentPath -PathType Container) { $CurrentPath } else { Split-Path $CurrentPath -Parent })
+            # Set initial directory if current path exists
+            $CurrentPath = $txtSourcePath.Text.Trim()
+            if (-not [string]::IsNullOrWhiteSpace($CurrentPath)) {
+                if (Test-Path $CurrentPath) { 
+                    $FileBrowser.InitialDirectory = $(if (Test-Path $CurrentPath -PathType Container) { $CurrentPath } else { Split-Path $CurrentPath -Parent })
+                }
+            }
+
+            if ($FileBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+                # Use parent directory of the selected file
+                $FolderPath = Split-Path $FileBrowser.FileName -Parent
+                $txtSourcePath.Text = $FolderPath
+                Update-Metadata -Path $FolderPath
             }
         }
-
-        if ($FileBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
-            # Use parent directory of the selected file
-            $FolderPath = Split-Path $FileBrowser.FileName -Parent
-            $txtSourcePath.Text = $FolderPath
-            Update-Metadata -Path $FolderPath
+        catch {
+            Write-GUIStatus "Browse failed: $($_.Exception.Message)" "ERROR"
+            [System.Windows.MessageBox]::Show("Browse failed: $($_.Exception.Message)", "Error")
         }
-    }
-    catch {
-        Write-GUIStatus "Browse failed: $($_.Exception.Message)" "ERROR"
-        [System.Windows.MessageBox]::Show("Browse failed: $($_.Exception.Message)", "Error")
-    }
-})
+    })
 
 $txtSourcePath.Add_LostFocus({
-    $CurrentPath = $txtSourcePath.Text.Trim()
-    if ($CurrentPath -ne $script:LastLoadedSourcePath) { Update-Metadata -Path $CurrentPath }
-})
+        $CurrentPath = $txtSourcePath.Text.Trim()
+        if ($CurrentPath -ne $script:LastLoadedSourcePath) { Update-Metadata -Path $CurrentPath }
+    })
 
 $btnRefreshDPs.Add_Click({ Refresh-DistributionLists -ForceRefresh })
 
@@ -310,125 +350,144 @@ function Get-SelectedItemsFromPanel {
     param($Panel)
     $Selected = New-Object System.Collections.Generic.List[string]
     $Window.Dispatcher.Invoke({
-        foreach ($Child in $Panel.Children) {
-            if ($Child -is [System.Windows.Controls.CheckBox] -and $Child.IsChecked) {
-                $Selected.Add($Child.Content.ToString())
+            foreach ($Child in $Panel.Children) {
+                if ($Child -is [System.Windows.Controls.CheckBox] -and $Child.IsChecked) {
+                    $Selected.Add($Child.Content.ToString())
+                }
             }
-        }
-    })
+        })
     return $Selected.ToArray()
 }
 
 # Unified Creation Action
 $btnCreate.Add_Click({
-    $Path = $txtSourcePath.Text.Trim()
-    if (-not $Path) {
-        [System.Windows.MessageBox]::Show("Please select a source path.", "Error")
-        return
-    }
+        $Path = $txtSourcePath.Text.Trim()
+        if (-not $Path) {
+            [System.Windows.MessageBox]::Show("Please select a source path.", "Error")
+            return
+        }
 
-    $SelectedGroups = Get-SelectedItemsFromPanel -Panel $pnlDPGroups
-    $SelectedDPs = Get-SelectedItemsFromPanel -Panel $pnlDPs
-    $SelectedCMGs = Get-SelectedItemsFromPanel -Panel $pnlCMGs
+        $SelectedGroups = Get-SelectedItemsFromPanel -Panel $pnlDPGroups
+        $SelectedDPs = Get-SelectedItemsFromPanel -Panel $pnlDPs
+        $SelectedCMGs = Get-SelectedItemsFromPanel -Panel $pnlCMGs
 
-    # Merge DPs and CMGs into a single DistributionPoints array
-    $DistributionPoints = @(
-        $SelectedCMGs
-        $SelectedDPs
-    ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        # Merge DPs and CMGs into a single DistributionPoints array
+        $DistributionPoints = @(
+            $SelectedCMGs
+            $SelectedDPs
+        ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 
-    # Require at least one target
-    if ($SelectedGroups.Count -eq 0 -and $DistributionPoints.Count -eq 0) {
-        [System.Windows.MessageBox]::Show(
-            "Please select at least one Target (DP Group, DP or CMG).",
-            "Error"
-        )
-        return
-    }
+        # Require at least one target
+        if ($SelectedGroups.Count -eq 0 -and $DistributionPoints.Count -eq 0) {
+            [System.Windows.MessageBox]::Show(
+                "Please select at least one Target (DP Group, DP or CMG).",
+                "Error"
+            )
+            return
+        }
 
-    $IsApp = $radApp.IsChecked
-    $ObjectName = if ($IsApp) {
-        $txtAppName.Text
-    }
-    else {
-        $txtPkgName.Text
-    }
-
-    # Custom Confirmation Dialog
-    $Confirmed = Show-PCXCMConfirmDialog `
-        -SourcePath $Path `
-        -Type $(if ($IsApp) { "Application" } else { "Package" }) `
-        -Name $ObjectName `
-        -Company $txtCompany.Text `
-        -Product $txtProduct.Text `
-        -Version $txtVersion.Text `
-        -Groups $SelectedGroups `
-        -DPs $SelectedDPs `
-        -CMGs $SelectedCMGs `
-        -RefNumber $txtRefNumber.Text `
-        -Reviewer $txtReviewer.Text `
-        -Comment $txtComment.Text
-
-    if (-not $Confirmed) {
-        return
-    }
-
-    try {
-        $btnCreate.IsEnabled = $false
-        $Window.Cursor = [System.Windows.Input.Cursors]::Wait
-
-        $Type = if ($IsApp) {
-            "APPLICATION"
+        $IsApp = $radApp.IsChecked
+        $ObjectName = if ($IsApp) {
+            $txtAppName.Text
         }
         else {
-            "PACKAGE"
+            $txtPkgName.Text
         }
 
-        Write-GUIStatus ">>> STARTING $Type CREATION: $ObjectName" "ACTION"
+        # Custom Confirmation Dialog
+        $Confirmed = Show-PCXCMConfirmDialog `
+            -SourcePath $Path `
+            -Type $(if ($IsApp) { "Application" } else { "Package" }) `
+            -Name $ObjectName `
+            -Company $txtCompany.Text `
+            -Product $txtProduct.Text `
+            -Version $txtVersion.Text `
+            -Groups $SelectedGroups `
+            -DPs $SelectedDPs `
+            -CMGs $SelectedCMGs `
+            -RefNumber $txtRefNumber.Text `
+            -Reviewer $txtReviewer.Text `
+            -Comment $txtComment.Text
 
-        $Params = @{
-            Path = $Path
-            ReferenceNumber = $txtRefNumber.Text
-            ReviewerName = $txtReviewer.Text
-            Comment = $txtComment.Text
+        if (-not $Confirmed) {
+            return
         }
 
-        if ($SelectedGroups.Count -gt 0) {
-            $Params["DistributionPointGroups"] = $SelectedGroups
-        }
+        try {
+            $btnCreate.IsEnabled = $false
+            $Window.Cursor = [System.Windows.Input.Cursors]::Wait
 
-        if ($DistributionPoints.Count -gt 0) {
-            $Params["DistributionPoints"] = $DistributionPoints
-        }
+            $Type = if ($IsApp) {
+                "APPLICATION"
+            }
+            else {
+                "PACKAGE"
+            }
 
-        if ($IsApp) {
-            Create-PCXCMApplication @Params
-        }
-        else {
-            Create-PCXCMPackage @Params
-        }
+            Write-GUIStatus ">>> STARTING $Type CREATION: $ObjectName" "ACTION"
 
-        Write-GUIStatus "SUCCESS: $Type created and distributed." "SUCCESS"
-        [System.Windows.MessageBox]::Show("$Type created successfully.", "Success")
-    }
-    catch {
-        Write-GUIStatus "FAILED: $($_.Exception.Message)" "ERROR"
-        [System.Windows.MessageBox]::Show(
-            "Creation failed: $($_.Exception.Message)",
-            "Error"
-        )
-    }
-    finally {
-        $btnCreate.IsEnabled = $true
-        $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
-    }
-})
+            $Params = @{
+                Path            = $Path
+                ReferenceNumber = $txtRefNumber.Text
+                ReviewerName    = $txtReviewer.Text
+                Comment         = $txtComment.Text
+            }
+
+            if ($SelectedGroups.Count -gt 0) {
+                $Params["DistributionPointGroups"] = $SelectedGroups
+            }
+
+            if ($DistributionPoints.Count -gt 0) {
+                $Params["DistributionPoints"] = $DistributionPoints
+            }
+
+            if ($IsApp) {
+                Create-PCXCMApplication @Params
+            }
+            else {
+                Create-PCXCMPackage @Params
+            }
+
+            Write-GUIStatus "SUCCESS: $Type created and distributed." "SUCCESS"
+            [System.Windows.MessageBox]::Show("$Type created successfully.", "Success")
+        }
+        catch {
+            Write-GUIStatus "FAILED: $($_.Exception.Message)" "ERROR"
+            [System.Windows.MessageBox]::Show(
+                "Creation failed: $($_.Exception.Message)",
+                "Error"
+            )
+        }
+        finally {
+            $btnCreate.IsEnabled = $true
+            $Window.Cursor = [System.Windows.Input.Cursors]::Arrow
+        }
+    })
 
 # ------------------------------------------------------------
 # Initialization
 # ------------------------------------------------------------
 
 Refresh-DistributionLists
+
+# Initialize comment character counter
+Update-CommentCharacterCount
+
+if ($radPkg.IsChecked) {
+
+    $btnCreate.Content = "CREATE PACKAGE"
+    $btnCreate.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#0078D4")
+    $pnlAppName.Visibility = "Collapsed"
+    $pnlPkgName.Visibility = "Visible"
+}
+else {
+
+    $btnCreate.Content = "CREATE APPLICATION"
+    $btnCreate.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#107C10")
+    $pnlAppName.Visibility = "Visible"
+    $pnlPkgName.Visibility = "Collapsed"
+}
+
 Write-GUIStatus "System Ready. Please select a package source folder to begin."
 
 # Show Window

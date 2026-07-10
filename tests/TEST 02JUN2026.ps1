@@ -151,14 +151,14 @@ Get-Item "\\192.168.25.214\Package_Source\Icons\Igor Pavlov7zip.png"
 
 
 Get-ChildItem .\src\Modules\PCXLab.SCCM\1.0.2 -Recurse -Include *.ps1 |
-    Select-String -Pattern "PCXSettings|Settings.json|ConvertFrom-Json"
+Select-String -Pattern "PCXSettings|Settings.json|ConvertFrom-Json"
 
-    Get-PCXCMSetting -Name "Package.DistributionSettings.Priority"
+Get-PCXCMSetting -Name "Package.DistributionSettings.Priority"
 
-    Get-PCXCMPackageDistributionPriority
+Get-PCXCMPackageDistributionPriority
 
 
-    Get-PCXCMSetting -Name "DefaultLimitingCollection"
+Get-PCXCMSetting -Name "DefaultLimitingCollection"
 Get-PCXCMSetting -Name "Package.DistributionSettings.Priority"
 Get-PCXCMSetting -Name "IconSettings.SecondaryIconFolder"
 Get-PCXCMSetting -Name "IconSettings.EnableSecondaryLookup"
@@ -169,3 +169,26 @@ New-PCXCMPackage -PackageName "PKG_7zip_2.0.1" -Company "Igor_Pavlov" -Version "
 
 New-CMPackage -comment 
 
+
+Get-ChildItem .\src\Modules\PCXLab.SCCM\1.0.2 -Recurse -Include *.ps1 |
+Select-String "DefaultLimitingCollection"
+
+
+#
+
+C:
+Remove-Module PCXLab.SCCM -Force
+Remove-Module PCXLab.SCCM
+Clear-Host
+Import-Module .\src\Modules\PCXLab.SCCM
+#Import-Module .\src\Modules\PCXLab.SCCM -Force
+
+get-module -Name PCXLab.SCCM
+Get-Command -Module PCXLab.SCCM
+
+
+
+Get-PCXCMDescriptionInformation `
+    -Reviewer "Abhishek.Mukesh" `
+    -RequestNumber "INC12345" `
+    -Comment "Updated to 7-Zip 26.1.6"
