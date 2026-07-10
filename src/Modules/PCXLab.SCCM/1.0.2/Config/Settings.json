@@ -35,6 +35,8 @@
     },
     "DescriptionSettings": {
         "MaximumLength": 127,
-        "DateFormat": "dd-MMM-yy HH:mm"
+        "DateFormat": "dd-MMM-yy HH:mm",
+        "Layout": "SingleLine",
+        "Separator": " "
     }
 }

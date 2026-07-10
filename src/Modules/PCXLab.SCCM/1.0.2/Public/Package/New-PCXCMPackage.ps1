@@ -42,6 +42,8 @@ function New-PCXCMPackage {
                 ErrorAction  = 'Stop'
             }
             
+            $Package = New-CMPackage @Params
+
             if ($Description) {
                 $Params.Description = $Description
             }

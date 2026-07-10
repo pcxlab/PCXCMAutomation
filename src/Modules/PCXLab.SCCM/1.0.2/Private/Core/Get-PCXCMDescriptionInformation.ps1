@@ -10,7 +10,6 @@ function Get-PCXCMDescriptionInformation {
     )
 
     try {
-
         # Read settings
         $MaximumCharacters = Get-PCXCMSetting -Name "DescriptionSettings.MaximumLength"
         if (-not $MaximumCharacters) {
@@ -38,6 +37,30 @@ function Get-PCXCMDescriptionInformation {
         # Generate timestamp
         $Date = Get-Date -Format $DateFormat
 
+        # Description layout
+        $Layout = Get-PCXCMSetting -Name "DescriptionSettings.Layout"
+
+        if ([string]::IsNullOrWhiteSpace($Layout)) {
+            $Layout = "SingleLine"
+        }
+
+        switch ($Layout.ToLower()) {
+            "multiline" {
+                $Separator = [Environment]::NewLine
+            }
+            "singleline" {
+                $Separator = Get-PCXCMSetting -Name "DescriptionSettings.Separator"
+
+                if ([string]::IsNullOrWhiteSpace($Separator)) {
+                    $Separator = " "
+                }
+            }
+
+            default {
+                throw "Invalid DescriptionSettings.Layout '$Layout'. Valid values are 'SingleLine' and 'MultiLine'."
+            }
+        }
+
         # Build description prefix
         $Lines = [System.Collections.Generic.List[string]]::new()
 
@@ -55,10 +78,10 @@ function Get-PCXCMDescriptionInformation {
 
         $Lines.Add($Date)
 
-        $Prefix = $Lines -join [Environment]::NewLine
+        $Prefix = $Lines -join $Separator
 
         if ($Prefix.Length -gt 0) {
-            $Prefix += [Environment]::NewLine
+            $Prefix += $Separator
         }
 
         $PrefixLength = $Prefix.Length
@@ -73,7 +96,7 @@ function Get-PCXCMDescriptionInformation {
             $Lines.Add($Comment)
         }
 
-        $Description = $Lines -join [Environment]::NewLine
+        $Description = $Lines -join $Separator
         $DescriptionLength = $Description.Length
 
         $Result = [PSCustomObject]@{
