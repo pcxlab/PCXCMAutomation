@@ -33,8 +33,6 @@ function New-PCXCMPackage {
             
             Write-PCXLog "Creating package: $PackageName"
 
-            #$Package = New-CMPackage -Name $PackageName -Manufacturer $Company -Version $Version -Language $Language -Path $Path -Description $Description -ErrorAction Stop
-
             $Params = @{
                 Name         = $PackageName
                 Manufacturer = $Company
