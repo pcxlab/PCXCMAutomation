@@ -195,17 +195,32 @@ function Update-CommentCharacterCount {
             -Comment $txtComment.Text
     }
 
-    #$lblComment.Content = "Comment ($($Info.RemainingCharacters) left | $($Info.DescriptionLength)/$($Info.MaximumCharacters))"
     $lblComment.Content = "Comment ($($Info.RemainingCharacters) left | $($Info.DescriptionLength)/$($Info.MaximumCharacters))"
 
     if ($Info.RemainingCharacters -le 10) {
         $lblComment.Foreground = [System.Windows.Media.Brushes]::Red
     }
     elseif ($Info.RemainingCharacters -le 20) {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::Firebrick
+    }
+    elseif ($Info.RemainingCharacters -le 30) {
         $lblComment.Foreground = [System.Windows.Media.Brushes]::DarkOrange
+    }
+    elseif ($Info.RemainingCharacters -le 40) {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::DarkGoldenrod
     }
     else {
         $lblComment.Foreground = [System.Windows.Media.Brushes]::DimGray
+    }
+
+    if ($Info.RemainingCharacters -le 15) {
+        $lblComment.FontWeight = "Bold"
+    }
+    elseif ($Info.RemainingCharacters -le 25) {
+        $lblComment.FontWeight = "SemiBold"
+    }
+    else {
+        $lblComment.FontWeight = "Normal"
     }
 }
 
