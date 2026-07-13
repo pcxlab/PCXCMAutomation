@@ -38,5 +38,94 @@
         "DateFormat": "dd-MMM-yy HH:mm",
         "Layout": "SingleLine",
         "Separator": " "
+    },
+    "DefaultSizing": {
+        "DiskSpace": {
+            "MaximumGB": 10,
+            "Thresholds": [
+                {
+                    "SizeGB": 1,
+                    "DiskSpaceGB": 5
+                },
+                {
+                    "SizeGB": 2,
+                    "DiskSpaceGB": 7
+                },
+                {
+                    "SizeGB": 3,
+                    "DiskSpaceGB": 9
+                }
+            ]
+        },
+        "EstimatedInstallationTime": {
+            "MaximumMinutes": 35,
+            "Thresholds": [
+                {
+                    "SizeMB": 150,
+                    "Minutes": 5
+                },
+                {
+                    "SizeMB": 500,
+                    "Minutes": 10
+                },
+                {
+                    "SizeMB": 1024,
+                    "Minutes": 15
+                },
+                {
+                    "SizeMB": 2048,
+                    "Minutes": 20
+                },
+                {
+                    "SizeMB": 3072,
+                    "Minutes": 25
+                },
+                {
+                    "SizeMB": 5120,
+                    "Minutes": 30
+                }
+            ]
+        },
+        "MaximumRunTime": {
+            "MaximumMinutes": 60,
+            "Thresholds": [
+                {
+                    "SizeMB": 150,
+                    "Minutes": 15
+                },
+                {
+                    "SizeMB": 300,
+                    "Minutes": 20
+                },
+                {
+                    "SizeMB": 500,
+                    "Minutes": 25
+                },
+                {
+                    "SizeMB": 750,
+                    "Minutes": 30
+                },
+                {
+                    "SizeMB": 1024,
+                    "Minutes": 35
+                },
+                {
+                    "SizeMB": 2048,
+                    "Minutes": 40
+                },
+                {
+                    "SizeMB": 3072,
+                    "Minutes": 45
+                },
+                {
+                    "SizeMB": 4096,
+                    "Minutes": 50
+                },
+                {
+                    "SizeMB": 5120,
+                    "Minutes": 55
+                }
+            ]
+        }
     }
 }

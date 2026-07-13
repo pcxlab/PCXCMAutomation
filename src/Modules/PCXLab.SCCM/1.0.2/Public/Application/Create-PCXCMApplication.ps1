@@ -27,23 +27,32 @@
             $Installer = Get-PCXCMPackageInstaller $Files
             $Meta = Get-PCXMetadataFromPath $Path
 
+            # Calculate sizing once for the entire application.
+            $SourceSize = Get-PCXSourceSize -Path $Path
+
+            $EstimatedInstallationTime = Get-PCXEstimatedInstallationTime -SizeMB $SourceSize.MB
+
+            $MaximumRunTime = Get-PCXMaximumRunTime -SizeMB $SourceSize.MB
+
+            $DiskSpaceGB = Get-PCXEstimatedDiskSpace -SizeGB $SourceSize.GB
+
             $ApplicationName = "APP $($Meta.Name)"
             $Collections = New-PCXCMDeploymentCollectionNames -ObjectName $ApplicationName
         
-            Write-PCXLog "Application: $ApplicationName"
-            Write-PCXLog "Publisher  : $($Meta.Company)"
-            Write-PCXLog "Version    : $($Meta.Version)"
-            Write-PCXLog "Installer  : $($Installer.Name)"
-            
-            Write-PCXLog "Ticket Reference Number is : $ReferenceNumber"
-            Write-PCXLog "Reviewer Name is : $ReviewerName"
-            Write-PCXLog "Comments is : $Comments"
+            Write-PCXLog "Application       : $ApplicationName"
+            Write-PCXLog "Publisher         : $($Meta.Company)"
+            Write-PCXLog "Version           : $($Meta.Version)"
+            Write-PCXLog "Installer         : $($Installer.Name)"
+            Write-PCXLog "Source Size       : $($SourceSize.MB) MB"
+            Write-PCXLog "Estimated Install Time : $EstimatedInstallationTime minutes"
+            Write-PCXLog "Maximum Run Time       : $MaximumRunTime minutes"
+            Write-PCXLog "Estimated Disk Space   : $DiskSpaceGB GB"
+            Write-PCXLog "Reference Number       : $ReferenceNumber"
+            Write-PCXLog "Reviewer               : $ReviewerName"
+            Write-PCXLog "Comment                : $Comments"
 
             # Resolve Application Icon
-            $Icon = Get-PCXCMApplicationIcon `
-                -SourcePath $Path `
-                -Company $Meta.Company `
-                -Product $Meta.Product
+            $Icon = Get-PCXCMApplicationIcon -SourcePath $Path -Company $Meta.Company -Product $Meta.Product
 
             if ($Icon.Found) {
                 Write-PCXLog "Using application icon from $($Icon.Source)"
@@ -53,9 +62,6 @@
             }
 
             # Step 1 - Create Application
-            #$Application = New-PCXCMApplication -ApplicationName $ApplicationName -Description $ApplicationName -Publisher $Meta.Company -SoftwareVersion $Meta.Version -ReleaseDate (Get-Date) -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
-            #$null = New-PCXCMApplication -ApplicationName $ApplicationName -Description $ApplicationName -Publisher $Meta.Company -SoftwareVersion $Meta.Version -ReleaseDate (Get-Date) -Iconlocationfile $(if ($IconFile) { $IconFile.FullName })
-
             # Icon redirection set
             $null = New-PCXCMApplication `
                 -ApplicationName $ApplicationName `
@@ -66,7 +72,13 @@
                 -IconLocationFile $(if ($Icon.Found) { $Icon.Path })
     
             # Step 2 - Add Deployment Type
-            New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $Installer.FullName
+            #New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $Installer.FullName
+
+            New-PCXCMApplicationDeploymentType `
+                -Name $ApplicationName `
+                -InstallationFileLocation $Installer.FullName `
+                -EstimatedInstallationTime $EstimatedInstallationTime `
+                -MaximumRunTime $MaximumRunTime
 
             # Step 3 - Content Distribution
             $null = Start-PCXCMContentDistribution `
@@ -83,7 +95,9 @@
                 Write-PCXLog "OS validation set not found. Skipping OS requirement." -Level WARNING
             }
 
-            $null = Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
+            #$null = Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
+            $null = Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB ($DiskSpaceGB * 1024)
+
             $null = Add-PCXCMApplicationMemoryRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumMemoryMB 4096
 
             # Step 5 - Collections

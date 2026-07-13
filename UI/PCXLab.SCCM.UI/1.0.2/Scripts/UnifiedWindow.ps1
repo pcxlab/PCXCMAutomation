@@ -40,6 +40,7 @@ $lblComment = $Window.FindName("lblComment")
 
 # State
 $script:LastLoadedSourcePath = ''
+$script:LastValidCaret = 0
 
 # ------------------------------------------------------------
 # Logging / Status Helpers
@@ -172,6 +173,7 @@ function Update-Metadata {
     }
 }
 
+<#
 function Update-CommentCharacterCount {
 
     $Info = Get-PCXCMDescriptionInformation `
@@ -217,6 +219,67 @@ function Update-CommentCharacterCount {
         $lblComment.FontWeight = "Bold"
     }
     elseif ($Info.RemainingCharacters -le 25) {
+        $lblComment.FontWeight = "SemiBold"
+    }
+    else {
+        $lblComment.FontWeight = "Normal"
+    }
+}
+#>
+
+function Update-CommentCharacterCount {
+
+    $Info = Get-PCXCMDescriptionInformation `
+        -Reviewer $txtReviewer.Text `
+        -RequestNumber $txtRefNumber.Text `
+        -Comment $txtComment.Text
+
+    # Normalize exactly like the backend
+    $NormalizedComment = ($txtComment.Text.Trim() -replace '\r?\n', ' ')
+
+    # Trim if the normalized comment exceeds the allowed limit
+    if ($NormalizedComment.Length -gt $Info.AllowedCommentLength) {
+
+        $Caret = $txtComment.CaretIndex
+
+        $NormalizedComment = $NormalizedComment.Substring(0, $Info.AllowedCommentLength)
+
+        $txtComment.Text = $NormalizedComment
+
+        $txtComment.CaretIndex = [Math]::Min($Caret, $txtComment.Text.Length)
+
+        # Refresh information after trimming
+        $Info = Get-PCXCMDescriptionInformation `
+            -Reviewer $txtReviewer.Text `
+            -RequestNumber $txtRefNumber.Text `
+            -Comment $txtComment.Text
+    }
+
+    $UsedCharacters = $Info.PrefixLength + $Info.NormalizedCommentLength
+    $RemainingCharacters = [Math]::Max(0, $Info.MaximumCharacters - $UsedCharacters)
+
+    $lblComment.Content = "Comment ($RemainingCharacters left | $UsedCharacters/$($Info.MaximumCharacters))"
+
+    if ($RemainingCharacters -le 10) {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::Red
+    }
+    elseif ($RemainingCharacters -le 20) {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::Firebrick
+    }
+    elseif ($RemainingCharacters -le 30) {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::DarkOrange
+    }
+    elseif ($RemainingCharacters -le 40) {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::DarkGoldenrod
+    }
+    else {
+        $lblComment.Foreground = [System.Windows.Media.Brushes]::DimGray
+    }
+
+    if ($RemainingCharacters -le 15) {
+        $lblComment.FontWeight = "Bold"
+    }
+    elseif ($RemainingCharacters -le 25) {
         $lblComment.FontWeight = "SemiBold"
     }
     else {

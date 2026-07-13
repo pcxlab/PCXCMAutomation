@@ -10,6 +10,7 @@ function Get-PCXCMDescriptionInformation {
     )
 
     try {
+
         # Read settings
         $MaximumCharacters = Get-PCXCMSetting -Name "DescriptionSettings.MaximumLength"
         if (-not $MaximumCharacters) {
@@ -50,7 +51,6 @@ function Get-PCXCMDescriptionInformation {
             }
             "singleline" {
                 $Separator = Get-PCXCMSetting -Name "DescriptionSettings.Separator"
-
                 if ([string]::IsNullOrWhiteSpace($Separator)) {
                     $Separator = " "
                 }
@@ -61,60 +61,57 @@ function Get-PCXCMDescriptionInformation {
             }
         }
 
-        # Build description prefix
-        $Lines = [System.Collections.Generic.List[string]]::new()
+        # Calculate prefix length
+        # (Creator + Reviewer + Request + Date)
+        $PrefixLines = [System.Collections.Generic.List[string]]::new()
 
-        if ($Creator) {
-            $Lines.Add($Creator)
-        }
+        if ($Creator) { $PrefixLines.Add($Creator) }
+        if ($Reviewer) { $PrefixLines.Add($Reviewer) }
+        if ($RequestNumber) { $PrefixLines.Add($RequestNumber) }
 
-        if ($Reviewer) {
-            $Lines.Add($Reviewer)
-        }
+        $PrefixLines.Add($Date)
 
-        if ($RequestNumber) {
-            $Lines.Add($RequestNumber)
-        }
+        $Prefix = $PrefixLines -join $Separator
 
-        $Lines.Add($Date)
-
-        $Prefix = $Lines -join $Separator
-
-        if ($Prefix.Length -gt 0) {
-            $Prefix += $Separator
-        }
+        if ($Prefix.Length -gt 0) { $Prefix += $Separator }
 
         $PrefixLength = $Prefix.Length
         $AllowedCommentLength = [Math]::Max(0, $MaximumCharacters - $PrefixLength)
 
-        # Trim comment if required
-        if ($Comment.Length -gt $AllowedCommentLength) {
-            $Comment = $Comment.Substring(0, $AllowedCommentLength)
-        }
+        # Trim comment
+        if ($Comment.Length -gt $AllowedCommentLength) { $Comment = $Comment.Substring(0, $AllowedCommentLength) }
 
-        if ($Comment) {
-            $Lines.Add($Comment)
-        }
+        # Build final description
+        $Lines = [System.Collections.Generic.List[string]]::new()
+
+        if ($Creator) { $Lines.Add($Creator) }
+        if ($Reviewer) { $Lines.Add($Reviewer) }
+        if ($RequestNumber) { $Lines.Add($RequestNumber) }
+        if ($Comment) { $Lines.Add($Comment) }
+
+        $Lines.Add($Date)
 
         $Description = $Lines -join $Separator
         $DescriptionLength = $Description.Length
 
         $Result = [PSCustomObject]@{
-            Description          = $Description
-            DescriptionLines     = $Lines.ToArray()
+            Description             = $Description
+            DescriptionLines        = $Lines.ToArray()
 
-            Creator              = $Creator
-            Reviewer             = $Reviewer
-            RequestNumber        = $RequestNumber
-            Date                 = $Date
-            Comment              = $Comment
+            Creator                 = $Creator
+            Reviewer                = $Reviewer
+            RequestNumber           = $RequestNumber
+            Date                    = $Date
+            Comment                 = $Comment
+            NormalizedCommentLength = $Comment.Length
 
-            DescriptionLength    = $DescriptionLength
-            PrefixLength         = $PrefixLength
-            MaximumCharacters    = $MaximumCharacters
-            RemainingCharacters  = $MaximumCharacters - $DescriptionLength
-            AllowedCommentLength = $AllowedCommentLength
-            IsValid              = ($DescriptionLength -le $MaximumCharacters)
+            DescriptionLength       = $DescriptionLength
+            PrefixLength            = $PrefixLength
+            MaximumCharacters       = $MaximumCharacters
+            #RemainingCharacters     = $MaximumCharacters - $DescriptionLength
+            RemainingCharacters     = [Math]::Max(0, $MaximumCharacters - $DescriptionLength)
+            AllowedCommentLength    = $AllowedCommentLength
+            IsValid                 = ($DescriptionLength -le $MaximumCharacters)
         }
 
         $Result.PSObject.TypeNames.Insert(0, 'PCXLab.SCCM.DescriptionInformation')

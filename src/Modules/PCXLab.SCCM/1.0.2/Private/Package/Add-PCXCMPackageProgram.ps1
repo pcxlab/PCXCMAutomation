@@ -5,6 +5,9 @@ function Add-PCXCMPackageProgram {
         [string]$PackageName,
 
         [Parameter(Mandatory)]
+        [string]$SourcePath,
+
+        [Parameter(Mandatory)]
         [string]$Type,
 
         [Parameter(Mandatory)]
@@ -21,7 +24,13 @@ function Add-PCXCMPackageProgram {
     process {
         try {
 
-            $name = "$PackageName [$Type]"
+            $SourceSize = Get-PCXSourceSize -Path $SourcePath
+
+            $DiskSpace = Get-PCXEstimatedDiskSpace -SizeGB $SourceSize.GB
+
+            $RunTime = Get-PCXMaximumRunTime -SizeMB $SourceSize.MB
+
+            $ProgramName = "$PackageName [$Type]"
 
             # Default values
             $runType = "WhetherOrNotUserIsLoggedOn"
@@ -34,21 +43,19 @@ function Add-PCXCMPackageProgram {
                 $userInteraction = $true
             }
 
-            #
             # Build New-CMProgram parameters
-            #
 
             $ProgramParams = @{
                 PackageName          = $PackageName
-                StandardProgramName  = $name
+                StandardProgramName  = $ProgramName
                 CommandLine          = $CommandLine
                 RunMode              = $runMode
                 ProgramRunType       = $runType
                 UserInteraction      = $userInteraction
                 RunType              = "Normal"
-                DiskSpaceRequirement = 5
+                DiskSpaceRequirement = $DiskSpace
                 DiskSpaceUnit        = "GB"
-                Duration             = 20
+                Duration             = $RunTime
             }
 
             # Only add supported platforms when supplied
@@ -62,14 +69,10 @@ function Add-PCXCMPackageProgram {
             # Post config ONLY for Available
             if ($Type -ieq "Available") {
 
-                $null = Set-CMProgram `
-                    -PackageName $PackageName `
-                    -ProgramName $name `
-                    -StandardProgram `
-                    -SuppressProgramNotification $false
+                $null = Set-CMProgram -PackageName $PackageName -ProgramName $ProgramName -StandardProgram -SuppressProgramNotification $false
             }
 
-            Write-PCXLog "$Type program created: $name"
+            Write-PCXLog "$Type program created: $ProgramName"
 
         }
         catch {
