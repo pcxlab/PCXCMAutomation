@@ -1,8 +1,12 @@
 function Add-PCXCMPackageProgram {
 
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [string]$PackageName,
+
+        [Parameter(Mandatory)]
+        [string]$ProgramName,
 
         [Parameter(Mandatory)]
         [string]$SourcePath,
@@ -30,8 +34,6 @@ function Add-PCXCMPackageProgram {
 
             $RunTime = Get-PCXMaximumRunTime -SizeMB $SourceSize.MB
 
-            $ProgramName = "$PackageName [$Type]"
-
             # Default values
             $runType = "WhetherOrNotUserIsLoggedOn"
             $userInteraction = $false
@@ -44,7 +46,6 @@ function Add-PCXCMPackageProgram {
             }
 
             # Build New-CMProgram parameters
-
             $ProgramParams = @{
                 PackageName          = $PackageName
                 StandardProgramName  = $ProgramName
@@ -63,13 +64,21 @@ function Add-PCXCMPackageProgram {
                 $ProgramParams.AddSupportedOperatingSystemPlatform = $Platforms
             }
 
+            Write-PCXLog "Package Name : $PackageName"
+            Write-PCXLog "Program Name : $ProgramName"
+            Write-PCXLog "Command Line : $CommandLine"
+
             # Create Program
             $null = New-CMProgram @ProgramParams
 
             # Post config ONLY for Available
             if ($Type -ieq "Available") {
 
-                $null = Set-CMProgram -PackageName $PackageName -ProgramName $ProgramName -StandardProgram -SuppressProgramNotification $false
+                $null = Set-CMProgram `
+                    -PackageName $PackageName `
+                    -ProgramName $ProgramName `
+                    -StandardProgram `
+                    -SuppressProgramNotification $false
             }
 
             Write-PCXLog "$Type program created: $ProgramName"

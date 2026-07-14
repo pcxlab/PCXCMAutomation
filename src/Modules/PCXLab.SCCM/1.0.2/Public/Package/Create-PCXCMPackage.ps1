@@ -35,7 +35,8 @@
             $Meta = Get-PCXMetadataFromPath $Path
             $PackageName = "PKG $($Meta.Name)"
 
-            $ProgramNames = New-PCXCMPackageProgramNames -PackageName $PackageName
+            $ProgramNames = New-PCXCMPackageProgramNames -Company $Meta.Company -Product $Meta.Product -Version $Meta.Version
+
             $Collections = New-PCXCMDeploymentCollectionNames -ObjectName $PackageName
 
             Write-PCXLog "Package           : $PackageName"
@@ -80,14 +81,14 @@
             # Create Package Programs
             $PackagePrograms = Get-PCXCMPackagePrograms -Installer $Installer -FileMap $FileMap
 
-
-
             foreach ($PackageProgram in $PackagePrograms) {
 
                 Write-PCXLog "Creating program: $($PackageProgram.Type)"
                 Write-PCXLog "Source Path     : $Path"
 
-                Add-PCXCMPackageProgram -PackageName $PackageName -SourcePath $Path -Type $PackageProgram.Type -CommandLine $PackageProgram.Command -Platforms $Platforms
+                #Add-PCXCMPackageProgram -PackageName $PackageName -SourcePath $Path -Type $PackageProgram.Type -CommandLine $PackageProgram.Command -Platforms $Platforms
+
+                Add-PCXCMPackageProgram -PackageName $PackageName -ProgramName $ProgramNames.$($PackageProgram.Type) -SourcePath $Path -Type $PackageProgram.Type -CommandLine $PackageProgram.Command -Platforms $Platforms
 
             }
 

@@ -30,7 +30,7 @@ Get-CMPackage -Name "PKG Igor Pavlov 7zip 27.121.3" -Fast
 
 
 Get-CMPackage -Name "PKG Igor Pavlov 7zip 27.121.3" -Fast |
-Format-Table Name,PackageID
+Format-Table Name, PackageID
 
 
 Get-Command Set-CMScriptDeploymentType -Syntax
@@ -39,3 +39,24 @@ Get-Command Set-CMMsiDeploymentType -Syntax
 
 Test-Path "\\192.168.25.214\Package_Source\Icons\"
 
+(Get-Command Add-PCXCMPackageProgram).Source
+
+(Get-Command Add-PCXCMPackageProgram).Module.Version
+
+(Get-Command Add-PCXCMPackageProgram).Definition
+
+(Get-Command Add-PCXCMPackageProgram).Definition
+
+
+(Get-Command New-PCXCMPackageProgramNames).Definition
+
+
+$ProgramNames = New-PCXCMPackageProgramNames `
+    -Company "Google" `
+    -Product "Chrome Enterprise" `
+    -Version "155.0.7632.03"
+
+$ProgramNames | Format-List *
+
+
+Get-Command New-PCXCMProgramName
