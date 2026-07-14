@@ -31,3 +31,11 @@ Get-CMPackage -Name "PKG Igor Pavlov 7zip 27.121.3" -Fast
 
 Get-CMPackage -Name "PKG Igor Pavlov 7zip 27.121.3" -Fast |
 Format-Table Name,PackageID
+
+
+Get-Command Set-CMScriptDeploymentType -Syntax
+
+Get-Command Set-CMMsiDeploymentType -Syntax
+
+Test-Path "\\192.168.25.214\Package_Source\Icons\"
+

@@ -30,10 +30,8 @@
             # Calculate sizing once for the entire application.
             $SourceSize = Get-PCXSourceSize -Path $Path
 
-            $EstimatedInstallationTime = Get-PCXEstimatedInstallationTime -SizeMB $SourceSize.MB
-
-            $MaximumRunTime = Get-PCXMaximumRunTime -SizeMB $SourceSize.MB
-
+            $InstallTime = Get-PCXEstimatedInstallationTime -SizeMB $SourceSize.MB
+            $RunTime = Get-PCXMaximumRunTime -SizeMB $SourceSize.MB
             $DiskSpaceGB = Get-PCXEstimatedDiskSpace -SizeGB $SourceSize.GB
 
             $ApplicationName = "APP $($Meta.Name)"
@@ -43,10 +41,12 @@
             Write-PCXLog "Publisher         : $($Meta.Company)"
             Write-PCXLog "Version           : $($Meta.Version)"
             Write-PCXLog "Installer         : $($Installer.Name)"
-            Write-PCXLog "Source Size       : $($SourceSize.MB) MB"
-            Write-PCXLog "Estimated Install Time : $EstimatedInstallationTime minutes"
-            Write-PCXLog "Maximum Run Time       : $MaximumRunTime minutes"
-            Write-PCXLog "Estimated Disk Space   : $DiskSpaceGB GB"
+
+            Write-PCXLog "Source Size                : $($SourceSize.MB) MB"
+            Write-PCXLog "Estimated Install Time     : $InstallTime minutes"
+            Write-PCXLog "Maximum Run Time           : $RunTime minutes"
+            Write-PCXLog "Estimated Disk Space       : $DiskSpaceGB GB"
+
             Write-PCXLog "Reference Number       : $ReferenceNumber"
             Write-PCXLog "Reviewer               : $ReviewerName"
             Write-PCXLog "Comment                : $Comments"
@@ -74,11 +74,18 @@
             # Step 2 - Add Deployment Type
             #New-PCXCMApplicationDeploymentType -Name $ApplicationName -InstallationFileLocation $Installer.FullName
 
+            <#
             New-PCXCMApplicationDeploymentType `
                 -Name $ApplicationName `
                 -InstallationFileLocation $Installer.FullName `
-                -EstimatedInstallationTime $EstimatedInstallationTime `
-                -MaximumRunTime $MaximumRunTime
+                -EstimatedInstallationTime $InstallTime `
+                -MaximumRunTime $RunTime
+
+            #>
+
+            New-PCXCMApplicationDeploymentType `
+                -Name $ApplicationName `
+                -InstallationFileLocation $Installer.FullName
 
             # Step 3 - Content Distribution
             $null = Start-PCXCMContentDistribution `
@@ -95,11 +102,12 @@
                 Write-PCXLog "OS validation set not found. Skipping OS requirement." -Level WARNING
             }
 
-            #$null = Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB 5120
             $null = Add-PCXCMApplicationDiskSpaceRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumDiskSpaceMB ($DiskSpaceGB * 1024)
-
             $null = Add-PCXCMApplicationMemoryRequirementToDeploymentType -ApplicationName $ApplicationName -MinimumMemoryMB 4096
 
+            #5. Step 5a - Deployment Type Configuration
+            $null = Set-PCXCMApplicationRuntime -ApplicationName $ApplicationName -EstimatedRuntimeMins $InstallTime -MaximumRuntimeMins $RunTime
+    
             # Step 5 - Collections
             New-PCXCMDeploymentDeviceCollections -Collections $Collections -LimitingCollectionName $LimitingCollectionName
 

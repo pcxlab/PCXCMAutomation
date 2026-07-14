@@ -28,7 +28,15 @@ function Get-PCXCMApplicationIcon {
             $Product
         ) | Select-Object -Unique
 
+        #
+        # Use FileSystem provider because SCCM runs from the CMSite provider.
+        #
+
+        $FileSystemSourcePath = "FileSystem::$SourcePath"
+
         Write-PCXLog "Searching for application icon..."
+        Write-PCXLog "Company           : $Company"
+        Write-PCXLog "Product           : $Product"
 
         #
         # Primary Search
@@ -38,15 +46,18 @@ function Get-PCXCMApplicationIcon {
 
             foreach ($Extension in $Extensions) {
 
-                $Icon = Join-Path $SourcePath ($Name + $Extension)
+                $Icon = Join-Path $FileSystemSourcePath ($Name + $Extension)
 
-                if (Test-Path $Icon) {
+                if (Test-Path -LiteralPath $Icon) {
 
-                    Write-PCXLog "Application icon found in source folder: $Icon"
+                    $ResolvedIcon = $Icon -replace '^FileSystem::', ''
+
+                    Write-PCXLog "Application icon found in source folder."
+                    Write-PCXLog "Icon Path         : $ResolvedIcon"
 
                     return [PSCustomObject]@{
                         Found  = $true
-                        Path   = $Icon
+                        Path   = $ResolvedIcon
                         Source = "ApplicationFolder"
                     }
 
@@ -76,7 +87,7 @@ function Get-PCXCMApplicationIcon {
 
         if ([string]::IsNullOrWhiteSpace($SharedFolder)) {
 
-            Write-PCXLog "Secondary icon folder not configured." -Level WARNING
+            Write-PCXLog "Secondary icon folder is not configured." -Level WARNING
 
             return [PSCustomObject]@{
                 Found  = $false
@@ -86,7 +97,9 @@ function Get-PCXCMApplicationIcon {
 
         }
 
-        if (-not (Test-Path $SharedFolder)) {
+        $FileSystemSharedFolder = "FileSystem::$SharedFolder"
+
+        if (-not (Test-Path -LiteralPath $FileSystemSharedFolder)) {
 
             Write-PCXLog "Secondary icon folder not found: $SharedFolder" -Level WARNING
 
@@ -102,15 +115,18 @@ function Get-PCXCMApplicationIcon {
 
             foreach ($Extension in $Extensions) {
 
-                $Icon = Join-Path $SharedFolder ($Name + $Extension)
+                $Icon = Join-Path $FileSystemSharedFolder ($Name + $Extension)
 
-                if (Test-Path $Icon) {
+                if (Test-Path -LiteralPath $Icon) {
 
-                    Write-PCXLog "Application icon found in shared repository: $Icon"
+                    $ResolvedIcon = $Icon -replace '^FileSystem::', ''
+
+                    Write-PCXLog "Application icon found in shared repository."
+                    Write-PCXLog "Icon Path         : $ResolvedIcon"
 
                     return [PSCustomObject]@{
                         Found  = $true
-                        Path   = $Icon
+                        Path   = $ResolvedIcon
                         Source = "SharedRepository"
                     }
 
