@@ -60,3 +60,36 @@ $ProgramNames | Format-List *
 
 
 Get-Command New-PCXCMProgramName
+
+
+If the output is too long, run these one at a time:
+
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Public\Connection\Connect-PCXCMSite.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Public\Connection\Ensure-PCXCMConnection.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Connection\Test-PCXCMConnection.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Connection\Get-PCXCMSiteCode.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Connection\Get-PCXCMProviderMachineName.ps1"
+
+Onc
+
+
+Please send me these two files next
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Core\Initialize-PCXCMEnvironment.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Core\Get-PCXCMSetting.ps1"
+
+Once I ha
+
+cls
+
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Public\Connection\Initialize-PCXCMEnvironment.ps1"
+
+
+coding style:
+
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Public\Connection\Connect-PCXCMSite.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Public\Connection\Ensure-PCXCMConnection.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Connection\Test-PCXCMConnection.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Connection\Get-PCXCMSiteCode.ps1"
+Get-Content "C:\Projects\PCXLABCMAutomation\src\Modules\PCXLab.SCCM\1.0.5\Private\Connection\Get-PCXCMProviderMachineName.ps1"
+
+O
