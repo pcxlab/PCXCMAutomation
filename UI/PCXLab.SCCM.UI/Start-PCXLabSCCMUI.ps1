@@ -37,29 +37,18 @@ if (-not (Test-Path $VersionPath)) {
     return
 }
 
-# Load essential UI functions from the selected version
-. (Join-Path $VersionPath "Functions\Import-PCXLabSCCMModule.ps1")
-. (Join-Path $VersionPath "Functions\Initialize-PCXLabSCCMUI.ps1")
+# Hand off execution to version bootstrap
+$AppBootstrapPath = Join-Path $VersionPath "App.ps1"
 
-try {
-
-    #Write-Host "Initializing PCXLab SCCM Unified Tool (v$Version)..." -ForegroundColor Cyan
-    Write-Host "Initializing PCXLab SCCM Application Manager v$Version..." -ForegroundColor Cyan
-
-    # Make version globally available to UI
-    $script:PCXUIVersion = $Version
-
-    # Load module and validate requirements
-    [void](Initialize-PCXLabSCCMUI)
-
-    # Launch UI
-    & (Join-Path $VersionPath "Scripts\UnifiedWindow.ps1")
-}
-catch {
+if (-not (Test-Path $AppBootstrapPath)) {
     [System.Windows.MessageBox]::Show(
-        $_.Exception.Message,
-        "Startup Error"
+        "Application bootstrap file 'App.ps1' not found at: $AppBootstrapPath",
+        "Launch Error"
     )
-
-    Write-Error $_.Exception.Message
+    return
 }
+
+# Make version globally available to UI
+$script:PCXUIVersion = $Version
+
+& $AppBootstrapPath
