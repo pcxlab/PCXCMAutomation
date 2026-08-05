@@ -1,0 +1,22 @@
+{
+    "_Version": "1.0",
+    "ModuleLoading": {
+        "Mode": "Auto",
+        "_Documentation": {
+            "SupportedValues": [
+                "Auto",
+                "Development",
+                "Installed",
+                "Portable"
+            ],
+            "Default": "Auto",
+            "Description": "Controls how the UI locates and imports the PCXLab.SCCM PowerShell module.",
+            "Descriptions": {
+                "Auto": "Try Development, then Installed, then Portable.",
+                "Development": "Always load from the development repository.",
+                "Installed": "Always load the installed PowerShell module.",
+                "Portable": "Always load from the portable deployment."
+            }
+        }
+    }
+}
